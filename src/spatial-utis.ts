@@ -1,4 +1,5 @@
-import { Position } from "geojson";
+import { Feature, Geometry, Position } from "geojson";
+import { deepCopy } from "./deep-copy";
 
 export default class SpatialUtils {
   /**
@@ -92,5 +93,18 @@ export default class SpatialUtils {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
     return radius * c;
+  }
+
+  /**
+   * Reduces the precision of a number
+   * @param coord The number to reduce
+   * @param reduceTo How many decimals to reduce it to
+   */
+  public static reducePrecision (coord: number, reduceTo: number): number {
+    return parseFloat(coord.toFixed(reduceTo))
+  }
+
+  public static reduceCoordinatePrecision (coords: Position, reduceTo: number): Position {
+    return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)]
   }
 }

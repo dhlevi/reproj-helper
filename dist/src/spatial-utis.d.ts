@@ -40,4 +40,11 @@ export default class SpatialUtils {
      * @param endCoord Ending coordinates
      */
     static haversineDistance(startCoord: Position, endCoord: Position): number;
+    /**
+     * Reduces the precision of a number
+     * @param coord The number to reduce
+     * @param reduceTo How many decimals to reduce it to
+     */
+    static reducePrecision(coord: number, reduceTo: number): number;
+    static reduceCoordinatePrecision(coords: Position, reduceTo: number): Position;
 }

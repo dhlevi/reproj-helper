@@ -87,6 +87,17 @@ var SpatialUtils = /** @class */ (function () {
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return radius * c;
     };
+    /**
+     * Reduces the precision of a number
+     * @param coord The number to reduce
+     * @param reduceTo How many decimals to reduce it to
+     */
+    SpatialUtils.reducePrecision = function (coord, reduceTo) {
+        return parseFloat(coord.toFixed(reduceTo));
+    };
+    SpatialUtils.reduceCoordinatePrecision = function (coords, reduceTo) {
+        return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)];
+    };
     return SpatialUtils;
 }());
 export default SpatialUtils;

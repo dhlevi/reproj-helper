@@ -71,6 +71,7 @@ var ReProjector = /** @class */ (function () {
     ReProjector.prototype.addDefinition = function (code, definition) {
         console.debug("Adding definition " + code);
         proj4.defs(code, definition);
+        return this;
     };
     /**
      * Set the feature you wish to project. The projected feature will be a deep copy

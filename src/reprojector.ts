@@ -11,7 +11,7 @@ import { deepCopy } from "./deep-copy"
  * 
  * Supports projecting GeoJSON Geometry, GeometryCollection, Feature and FeatureCollection objects
  * 
- * Supports stringing functions together for convinience, ie:
+ * Supports chaining functions together for convinience, ie:
  * projector.from().to().source().project();
  */
 export default class ReProjector {
@@ -19,6 +19,13 @@ export default class ReProjector {
   public fromProjection: string
   public toProjection: string
 
+  /**
+   * Constructor for ReProjector class. This will initialize a set of proejction definitions as well.
+   * Definitions include: [ EPGS:3005, EPGS:3857, EPGS:3348, EPGS:3979, EPGS:3579, EPGS:3402 ] as well as
+   * UTM zones 7N through 15N (As codes UTM<zone number>)
+   * Default From Projection is EGSP:3005
+   * Default To projection is WGS84
+   */
   constructor () {
     this.init()
 
@@ -26,6 +33,15 @@ export default class ReProjector {
     // Defaults to projecting BC Albers into WGS 84, our most common use case
     this.fromProjection = 'EPSG:3005'
     this.toProjection = 'WGS84'
+  }
+
+  /**
+   * Static initializer for a ReProjector instance
+   * Useful if you intend on chaining, ie:
+   * ReProjector.instance().feature({...}).from('EPSG:3005').to('EPSG:3579').project();
+   */
+  public static instance (): ReProjector {
+    return new ReProjector()
   }
 
   private init () {
@@ -43,7 +59,16 @@ export default class ReProjector {
     proj4.defs("EPSG:3579","+proj=aea +lat_1=61.66666666666666 +lat_2=68 +lat_0=59 +lon_0=-132.5 +x_0=500000 +y_0=500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs")
     // Alberta 10-TM Forest
     proj4.defs("EPSG:3402","+proj=tmerc +lat_0=0 +lon_0=-115 +k=0.9992 +x_0=500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs")
-
+    // utms 7N through 15n
+    proj4.defs("UTM7","+proj=utm +zone=7 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM8","+proj=utm +zone=8 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM9","+proj=utm +zone=9 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM10","+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM11","+proj=utm +zone=11 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM12","+proj=utm +zone=12 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM13","+proj=utm +zone=13 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM14","+proj=utm +zone=14 +datum=WGS84 +units=m +no_defs");
+    proj4.defs("UTM15","+proj=utm +zone=15 +datum=WGS84 +units=m +no_defs");
   }
 
   /**
@@ -70,7 +95,7 @@ export default class ReProjector {
 
   /**
    * Projection code to use on the "from" projection
-   * @param from Code
+   * @param from Code (usually an EPSG Code)
    */
   public from (from: string): ReProjector {
     console.debug(`Projecting from ${from}`)
@@ -80,7 +105,7 @@ export default class ReProjector {
 
   /**
    * Projection code to use on the "To" projection
-   * @param from Code
+   * @param from Code (usually an EPSG Code)
    */
   public to (to: string): ReProjector {
     console.debug(`Projecting to ${to}`)
@@ -101,30 +126,36 @@ export default class ReProjector {
       throw new Error('Invalid Source Feature')
     }
 
-    const clonedFeature =  deepCopy(this.sourceFeature)
+    let clonedFeature = null
 
-    if (clonedFeature.type === 'FeatureCollection') {
-      for (const feature of clonedFeature.features) {
-        if (feature.geometry.type === 'GeometryCollection') {
-          for (const geometry of feature.geometry.geometries) {
-            this.projectGeometry(geometry)
+    try {
+      clonedFeature =  deepCopy(this.sourceFeature)
+  
+      if (clonedFeature.type === 'FeatureCollection') {
+        for (const feature of clonedFeature.features) {
+          if (feature.geometry.type === 'GeometryCollection') {
+            for (const geometry of feature.geometry.geometries) {
+              this.projectGeometry(geometry)
+            }
+          } else {
+            this.projectGeometry(feature.geometry as Geometry)
           }
-        } else {
-          this.projectGeometry(feature.geometry as Geometry)
         }
+      } else if (clonedFeature.type === 'GeometryCollection') {
+        for (const geometry of clonedFeature.geometries) {
+          this.projectGeometry(geometry)
+        }
+      } else if (clonedFeature.type === 'Feature' && clonedFeature.geometry.type === 'GeometryCollection') {
+        for (const geometry of clonedFeature.geometry.geometries) {
+          this.projectGeometry(geometry)
+        }
+      } else if (clonedFeature.type === 'Feature') {
+        this.projectGeometry(clonedFeature.geometry)
+      } else {
+        this.projectGeometry(clonedFeature as Geometry)
       }
-    } else if (clonedFeature.type === 'GeometryCollection') {
-      for (const geometry of clonedFeature.geometries) {
-        this.projectGeometry(geometry)
-      }
-    } else if (clonedFeature.type === 'Feature' && clonedFeature.geometry.type === 'GeometryCollection') {
-      for (const geometry of clonedFeature.geometry.geometries) {
-        this.projectGeometry(geometry)
-      }
-    } else if (clonedFeature.type === 'Feature') {
-      this.projectGeometry(clonedFeature.geometry)
-    } else {
-      this.projectGeometry(clonedFeature as Geometry)
+    } catch (err) {
+      console.error(`Failed to reproject feature: ${err}`)
     }
 
     return clonedFeature

@@ -1,7 +1,6 @@
 {
   "name": "reproj-helper",
   "version": "1.0.0",
-  "private": true,
   "description": "Helper library for reprojecting geojson geometries with proj4js",
   "author": {
     "name": "dhlevi"

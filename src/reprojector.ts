@@ -2,6 +2,18 @@ import { Feature, FeatureCollection, Geometry, Position } from "geojson"
 import proj4 from "proj4"
 import { deepCopy } from "./deep-copy"
 
+/**
+ * A simple Reprojection class that works with Proj4 for 
+ * simplifying reprojection of GeoJson objects.
+ * 
+ * Defaults to BC Albers and WGS84, but any projection string
+ * Proj4 supports can be included.
+ * 
+ * Supports projecting GeoJSON Geometry, GeometryCollection, Feature and FeatureCollection objects
+ * 
+ * Supports stringing functions together for convinience, ie:
+ * projector.from().to().source().project();
+ */
 export default class ReProjector {
   public sourceFeature: FeatureCollection | Feature | Geometry | null
   public fromProjection: string
@@ -34,29 +46,53 @@ export default class ReProjector {
 
   }
 
+  /**
+   * Adds a definition string to Proj4. Use the definition by specifying the
+   * code set here in the to and from functions
+   * @param code Your desired code
+   * @param definition The proj4 definition string
+   */
   public addDefinition (code: string, definition: string) {
     console.debug(`Adding definition ${code}`)
     proj4.defs(code, definition)
   }
 
+  /**
+   * Set the feature you wish to project. The projected feature will be a deep copy
+   * The original feature passed in will be untouched.
+   * @param feature Feature Type
+   */
   public feature (feature: FeatureCollection | Feature | Geometry): ReProjector {
     console.debug('Source Feature set')
     this.sourceFeature = feature
     return this
   }
 
+  /**
+   * Projection code to use on the "from" projection
+   * @param from Code
+   */
   public from (from: string): ReProjector {
     console.debug(`Projecting from ${from}`)
     this.fromProjection = from
     return this
   }
 
+  /**
+   * Projection code to use on the "To" projection
+   * @param from Code
+   */
   public to (to: string): ReProjector {
     console.debug(`Projecting to ${to}`)
     this.toProjection = to
     return this
   }
 
+  /**
+   * Run the projection. This function is asyncronous and will
+   * return a promise by default. The source feature must be set prior
+   * Your source feature will be deep cloned and not modified by this process
+   */
   public async project (): Promise<FeatureCollection | Feature | Geometry | null> {
     console.debug('Starting projection')
 

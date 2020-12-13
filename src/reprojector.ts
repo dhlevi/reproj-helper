@@ -80,6 +80,7 @@ export default class ReProjector {
   public addDefinition (code: string, definition: string) {
     console.debug(`Adding definition ${code}`)
     proj4.defs(code, definition)
+    return this
   }
 
   /**

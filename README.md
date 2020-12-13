@@ -46,6 +46,9 @@ const projectedJson = await projector.feature({...some feature...}).from('EPSG:C
 
 // Method three
 const projectedJson = await ReProjector.instance().feature({...some feature...}).from('EPSG:CODE').to('EPSG:CODE').project()
+
+// Add a def
+projector.addDefinition('Some Code', 'A definition string')
 ```
 
 Pretty simple! Use the static initializer if you're running a one-off projection, and instantiate an object if you'll be doing a bunch.
@@ -61,3 +64,7 @@ These include:
 - Convert Decimal Degrees to a DMS String
 - Haversine distance
 - Coordinate precision reducer
+
+## Thanks!
+
+For more info on [proj4js](http://proj4js.org/), click that link. To find projection definitions, check ou epsg.io

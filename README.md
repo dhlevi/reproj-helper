@@ -37,8 +37,8 @@ const projector = new ReProjector()
 
 // Method one
 projector.feature({...some feature...})
-projector.from('EPGS:CODE')
-projector.to('EPGS:CODE')
+projector.from('EPSG:CODE')
+projector.to('EPSG:CODE')
 const projectedJson = await projector.project()
 
 // Method two

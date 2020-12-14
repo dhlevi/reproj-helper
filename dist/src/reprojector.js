@@ -16,7 +16,7 @@ import { deepCopy } from "./deep-copy";
 var ReProjector = /** @class */ (function () {
     /**
      * Constructor for ReProjector class. This will initialize a set of proejction definitions as well.
-     * Definitions include: [ EPGS:3005, EPGS:3857, EPGS:3348, EPGS:3979, EPGS:3579, EPGS:3402 ] as well as
+     * Definitions include: [ EPSG:3005, EPSG:3857, EPSG:3348, EPSG:3979, EPSG:3579, EPSG:3402 ] as well as
      * UTM zones 7N through 15N (As codes UTM<zone number>)
      * Default From Projection is EGSP:3005
      * Default To projection is WGS84

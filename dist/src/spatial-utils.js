@@ -31,7 +31,8 @@ var SpatialUtils = /** @class */ (function () {
     SpatialUtils.utmLetterDesignation = function (latitude) {
         var letter = '';
         if (-80 <= latitude && latitude <= 84) {
-            letter = 'CDEFGHJKLMNPQRSTUVWXX'[(latitude + 80) / 8];
+            console.log((latitude + 80) / 8);
+            letter = 'CDEFGHJKLMNPQRSTUVWXX'[Math.floor((latitude + 80) / 8)];
         }
         else {
             letter = 'Z'; // Error flag. Outside UTM Limits
@@ -53,10 +54,11 @@ var SpatialUtils = /** @class */ (function () {
      * @param dd The decimal degrees
      * @param showMarks Show degree characters
      */
-    SpatialUtils.ddToDmsString = function (dd, showMarks) {
+    SpatialUtils.ddToDmsString = function (dd, showMarks, maxDecimals) {
+        if (maxDecimals === void 0) { maxDecimals = 2; }
         var d = Math.floor(dd);
         var m = Math.floor((dd - d) * 60);
-        var s = (dd - d - m / 60) * 3600;
+        var s = this.reducePrecision((dd - d - m / 60) * 3600, maxDecimals);
         return showMarks ? d + "\u00B0 " + m + "' " + s + "\"" : d + " " + m + " " + s;
     };
     /**
@@ -69,7 +71,7 @@ var SpatialUtils = /** @class */ (function () {
     SpatialUtils.latLonToDmsString = function (latitude, longitude, showMarks) {
         return {
             latitudeDMS: this.ddToDmsString(latitude, showMarks) + " " + (latitude < 0 ? 'S' : 'N'),
-            longitudeDMS: this.ddToDmsString(longitude, showMarks) + " + " + (longitude < 0 ? 'W' : 'E')
+            longitudeDMS: this.ddToDmsString(longitude, showMarks) + " " + (longitude < 0 ? 'W' : 'E')
         };
     };
     /**
@@ -101,4 +103,4 @@ var SpatialUtils = /** @class */ (function () {
     return SpatialUtils;
 }());
 export default SpatialUtils;
-//# sourceMappingURL=spatial-utis.js.map
+//# sourceMappingURL=spatial-utils.js.map

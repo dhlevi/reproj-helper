@@ -1,5 +1,4 @@
-import { Feature, Geometry, Position } from "geojson";
-import { deepCopy } from "./deep-copy";
+import { Position } from "geojson";
 
 export default class SpatialUtils {
   /**
@@ -32,7 +31,8 @@ export default class SpatialUtils {
     let letter = ''
 
     if (-80 <= latitude && latitude <= 84) {
-      letter = 'CDEFGHJKLMNPQRSTUVWXX'[(latitude + 80) / 8]
+      console.log((latitude + 80) / 8)
+      letter = 'CDEFGHJKLMNPQRSTUVWXX'[Math.floor((latitude + 80) / 8)]
     } else {
       letter = 'Z' // Error flag. Outside UTM Limits
     }
@@ -55,10 +55,10 @@ export default class SpatialUtils {
    * @param dd The decimal degrees
    * @param showMarks Show degree characters
    */
-  public static ddToDmsString (dd: number, showMarks: boolean): string {
+  public static ddToDmsString (dd: number, showMarks: boolean, maxDecimals: number = 2): string {
     const d = Math.floor(dd)
     const m = Math.floor((dd - d) * 60)
-    const s = (dd - d - m / 60) * 3600
+    const s = this.reducePrecision((dd - d - m / 60) * 3600, maxDecimals)
     return showMarks ? `${d}° ${m}' ${s}"` : `${d} ${m} ${s}`
   }
 
@@ -72,7 +72,7 @@ export default class SpatialUtils {
   public static latLonToDmsString (latitude: number, longitude: number, showMarks: boolean) {
     return {
       latitudeDMS: `${this.ddToDmsString(latitude, showMarks)} ${(latitude < 0 ? 'S' : 'N')}`,
-      longitudeDMS: `${this.ddToDmsString(longitude, showMarks)} + ${(longitude < 0 ? 'W' : 'E')}`
+      longitudeDMS: `${this.ddToDmsString(longitude, showMarks)} ${(longitude < 0 ? 'W' : 'E')}`
     }
   }
 

@@ -55,7 +55,7 @@ export default class SpatialUtils {
    * @param dd The decimal degrees
    * @param showMarks Show degree characters
    */
-  public static ddToDmsString (dd: number, showMarks: boolean, maxDecimals: number = 2): string {
+  public static ddToDmsString (dd: number, showMarks: boolean, maxDecimals = 2): string {
     const d = Math.floor(dd)
     const m = Math.floor((dd - d) * 60)
     const s = this.reducePrecision((dd - d - m / 60) * 3600, maxDecimals)

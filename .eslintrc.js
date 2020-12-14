@@ -3,12 +3,15 @@ module.exports = {
   env: {
     node: true
   },
-
-  extends: [
-  ],
+  extends: ['plugin:@typescript-eslint/recommended'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   parserOptions: {
     ecmaVersion: 2015,
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      experimentalObjectRestSpread: true
+    }
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',

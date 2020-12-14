@@ -211,7 +211,7 @@ export default class ReProjector {
   }
 
   private projectPoint(coords: Position) {
-    let projectedCoords = proj4(this.fromProjection, this.toProjection, coords)
+    const projectedCoords = proj4(this.fromProjection, this.toProjection, coords)
 
     coords[0] = projectedCoords[0]
     coords[1] = projectedCoords[1]

@@ -249,5 +249,5 @@ var ReProjector = /** @class */ (function () {
     };
     return ReProjector;
 }());
-export default ReProjector;
+export { ReProjector };
 //# sourceMappingURL=reprojector.js.map

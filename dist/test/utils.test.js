@@ -1,4 +1,4 @@
-import SpatialUtils from "../src/spatial-utils";
+import { SpatialUtils } from "../src/spatial-utils";
 describe('spatial-utils.ts', function () {
     it('Test ddToDms converstions', function () {
         var dmsString = SpatialUtils.ddToDmsString(55.8878, true);

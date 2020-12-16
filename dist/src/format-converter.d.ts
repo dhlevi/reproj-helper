@@ -7,7 +7,7 @@ import { Feature, FeatureCollection, Geometry } from "geojson";
  * I'm sure you're immediately wondering why I did WKT Parsing without Regex
  * Me too... me too...
  */
-export default class FormatConverter {
+export declare class FormatConverter {
     private sourceWkt;
     private sourceJson;
     /**

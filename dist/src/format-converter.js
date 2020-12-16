@@ -265,5 +265,5 @@ var FormatConverter = /** @class */ (function () {
     };
     return FormatConverter;
 }());
-export default FormatConverter;
+export { FormatConverter };
 //# sourceMappingURL=format-converter.js.map

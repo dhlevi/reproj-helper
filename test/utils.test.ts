@@ -1,4 +1,4 @@
-import SpatialUtils from "../src/spatial-utils"
+import { SpatialUtils } from "../src/spatial-utils"
 
 describe('spatial-utils.ts', () => {
   it('Test ddToDms converstions', () => {

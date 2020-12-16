@@ -11,7 +11,7 @@ import { Feature, FeatureCollection, Geometry } from "geojson";
  * Supports chaining functions together for convinience, ie:
  * projector.from().to().source().project();
  */
-export default class ReProjector {
+export declare class ReProjector {
     sourceFeature: FeatureCollection | Feature | Geometry | null;
     fromProjection: string;
     toProjection: string;

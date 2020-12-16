@@ -9,7 +9,7 @@ import { deepCopy } from "./deep-copy"
  * I'm sure you're immediately wondering why I did WKT Parsing without Regex
  * Me too... me too...
  */
-export default class FormatConverter {
+export class FormatConverter {
   private sourceWkt: string | null = null
   private sourceJson: FeatureCollection | Feature | Geometry | null = null
 

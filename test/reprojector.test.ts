@@ -1,4 +1,4 @@
-import ReProjector from "../src/reprojector"
+import { ReProjector } from "../src/reprojector"
 
 describe('Reprojector.ts', () => {
   it('Test epsg def', async () => {

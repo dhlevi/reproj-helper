@@ -1,5 +1,5 @@
 import { __awaiter, __generator } from "tslib";
-import ReProjector from "../src/reprojector";
+import { ReProjector } from "../src/reprojector";
 describe('Reprojector.ts', function () {
     it('Test epsg def', function () { return __awaiter(void 0, void 0, void 0, function () {
         var projector, json;

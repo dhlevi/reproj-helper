@@ -1,5 +1,5 @@
 import { Feature, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon } from "geojson"
-import FormatConverter from "../src/format-converter"
+import { FormatConverter } from "../src/format-converter"
 
 describe('format-converter.ts', () => {
   it('Test fail on empty', async () => {

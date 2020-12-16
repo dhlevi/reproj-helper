@@ -1,6 +1,6 @@
 import { Position } from "geojson";
 
-export default class SpatialUtils {
+export class SpatialUtils {
   /**
    * Returns the UTM Zone for a given longitude. Includes rules beyond just BC/Canada
    * @param latitude The Latitude. Needed to determine zones with special rules (Svalbard)

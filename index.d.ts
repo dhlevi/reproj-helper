@@ -1,4 +1,4 @@
-export * from "./dist/src/reprojector";
-export * from "./dist/src/spatial-utils";
-export * from "./dist/src/format-converter";
+export { ReProjector } from "./dist/src/reprojector";
+export { SpatialUtils } from "./dist/src/spatial-utils";
+export { FormatConverter } from "./dist/src/format-converter";
 export { deepCopy } from "./dist/src/deep-copy";

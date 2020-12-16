@@ -1,5 +1,5 @@
 import { __awaiter, __generator } from "tslib";
-import FormatConverter from "../src/format-converter";
+import { FormatConverter } from "../src/format-converter";
 describe('format-converter.ts', function () {
     it('Test fail on empty', function () { return __awaiter(void 0, void 0, void 0, function () {
         var converter, failed, result;

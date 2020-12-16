@@ -15,7 +15,7 @@ import * as https from "https"
  * Supports chaining functions together for convinience, ie:
  * projector.from().to().source().project();
  */
-export default class ReProjector {
+export class ReProjector {
   public sourceFeature: FeatureCollection | Feature | Geometry | null
   public fromProjection: string
   public toProjection: string

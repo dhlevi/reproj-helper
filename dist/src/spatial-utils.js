@@ -101,5 +101,5 @@ var SpatialUtils = /** @class */ (function () {
     };
     return SpatialUtils;
 }());
-export default SpatialUtils;
+export { SpatialUtils };
 //# sourceMappingURL=spatial-utils.js.map

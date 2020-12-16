@@ -31,7 +31,6 @@ export default class SpatialUtils {
     let letter = ''
 
     if (-80 <= latitude && latitude <= 84) {
-      console.log((latitude + 80) / 8)
       letter = 'CDEFGHJKLMNPQRSTUVWXX'[Math.floor((latitude + 80) / 8)]
     } else {
       letter = 'Z' // Error flag. Outside UTM Limits

@@ -31,7 +31,6 @@ var SpatialUtils = /** @class */ (function () {
     SpatialUtils.utmLetterDesignation = function (latitude) {
         var letter = '';
         if (-80 <= latitude && latitude <= 84) {
-            console.log((latitude + 80) / 8);
             letter = 'CDEFGHJKLMNPQRSTUVWXX'[Math.floor((latitude + 80) / 8)];
         }
         else {

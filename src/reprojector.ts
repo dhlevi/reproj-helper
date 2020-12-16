@@ -1,6 +1,7 @@
 import { Feature, FeatureCollection, Geometry, Position } from "geojson"
 import proj4 from "proj4"
 import { deepCopy } from "./deep-copy"
+import * as https from "https"
 
 /**
  * A simple Reprojection class that works with Proj4 for 
@@ -78,7 +79,7 @@ export default class ReProjector {
    * @param definition The proj4 definition string
    */
   public addDefinition (code: string, definition: string) {
-    console.debug(`Adding definition ${code}`)
+    console.debug(`Adding definition ${code} - ${definition}`)
     proj4.defs(code, definition)
     return this
   }
@@ -112,6 +113,35 @@ export default class ReProjector {
     console.debug(`Projecting to ${to}`)
     this.toProjection = to
     return this
+  }
+
+  /**
+   * Will attempt to load a proj4 definition from epsg.io
+   * @param epsgCode An EPSG Code, 3005 or EPSG:3005
+   */
+  public async addDefinitionFromEpsgIo (epsgCode: string): Promise<string> {
+    const code = epsgCode.trim().includes(':') ? epsgCode.split(':')[1].trim() : epsgCode.trim()
+    const newDef = await new Promise<string>(function(resolve, reject) {
+      https.get(`https://epsg.io/${code}.proj4`, resp => {
+        let data = ''
+        resp.on('data', (chunk) => {
+          data += chunk
+        });
+        resp.on('end', () => {
+          resolve(data)
+        });
+      }).on("error", (err: { message: string }) => {
+        reject(err)
+      });
+    });
+
+    if (newDef && newDef.length > 0) {
+      this.addDefinition(epsgCode, newDef)
+    } else {
+      throw new Error(`Could not find definition for "${epsgCode}"`)
+    }
+
+    return newDef
   }
 
   /**

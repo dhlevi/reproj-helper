@@ -20,6 +20,10 @@ The ReProjector class is pre-initialized with several additional projections (th
 
 The ReProjector sets the default `From` projection to BC Albers, and the default `To` projection to WGS84.
 
+You can add definitions manually by calling `addDefinition('Code', 'A definition string')` with the code you want to use, and an appropriate definition string.
+
+You can also call `addDefinitionFromEpsgIo('Code')` which will attempt to find the supplied epsg code on [epsg.io](epsg.io) and load it for you.
+
 ### Is the `project()` function asynchronous?
 
 Yes, the `project()` function is asynchronous, just in case you're dealing with large features and want to do other things while it grinds away. It will return a Promise<Feature|Geometry|Null>. Null will be returned if projection fails (an error is also logged on the console).
@@ -49,9 +53,14 @@ const projectedJson = await ReProjector.instance().feature({...some feature...})
 
 // Add a def
 projector.addDefinition('Some Code', 'A definition string')
+
+// Add a def by searching epsg.io
+projector.addDefinitionFromEpsgIo('EPSG:2154')
 ```
 
 Pretty simple! Use the static initializer if you're running a one-off projection, and instantiate an object if you'll be doing a bunch.
+
+
 
 ### Got anything else?
 
@@ -64,7 +73,33 @@ These include:
 - Convert Decimal Degrees to a DMS String
 - Haversine distance
 - Coordinate precision reducer
+- Basic converter for WKT (See the FormatConverter class)
+
+## Format Converter
+
+There's a simple format converter for converting WKT to GeoJSON, or vice versa. Currently it does not support `POINT ZM`, `POINT M`, `TRIANGLE`, `TIN`, or `POLYHEDRALSURFACE Z` but support for those will be on the way eventually. Converting other formats is also planned for a future update.
+
+### Converter Usage
+
+Similar to the `ReProjector` described above:
+
+```typescript
+const converter = new FormatConverter()
+
+const sourceWkt = 'POINT (0 0)'
+const json = converter.fromWkt(sourceWkt).toGeoJson()
+
+// Or, the other way around
+
+const sourceJson = {
+  type: 'Point',
+  coordinates: [0, 0]
+}
+const wkt = converter.fromGeoJson(sourceWkt).toWkt()
+```
+
+You can supply `FeatureCollection`, `GeometryCollection`, `Feature` or `Geometry`. FeatureCollections will convert to a WKT `GEOMETRYCOLLECTION`. Converting to GeoJSON will result in `Feature` objects being returned. Converting WKT `GEOMETRYCOLLECTION` will result in a `Feature` GeoJSON, with a geometry type of `GeometryCollection`
 
 ## Thanks!
 
-For more info on [proj4js](http://proj4js.org/), click that link. To find projection definitions, check ou epsg.io
+For more info on [proj4js](http://proj4js.org/), click that link. To find projection definitions, check ou [epsg.io](epsg.io)

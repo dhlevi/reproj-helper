@@ -54,6 +54,11 @@ export default class ReProjector {
      */
     to(to: string): ReProjector;
     /**
+     * Will attempt to load a proj4 definition from epsg.io
+     * @param epsgCode An EPSG Code, 3005 or EPSG:3005
+     */
+    addDefinitionFromEpsgIo(epsgCode: string): Promise<string>;
+    /**
      * Run the projection. This function is asyncronous and will
      * return a promise by default. The source feature must be set prior
      * Your source feature will be deep cloned and not modified by this process

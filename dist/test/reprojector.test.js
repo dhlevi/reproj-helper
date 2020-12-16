@@ -1,6 +1,28 @@
 import { __awaiter, __generator } from "tslib";
 import ReProjector from "../src/reprojector";
 describe('Reprojector.ts', function () {
+    it('Test epsg def', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var projector, json;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    projector = new ReProjector();
+                    return [4 /*yield*/, projector.addDefinitionFromEpsgIo('EPSG:2154')];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, projector.feature({
+                            type: 'Point',
+                            coordinates: [0, 0]
+                        }).from('WGS84').to('EPSG:2154').project()];
+                case 2:
+                    json = _a.sent();
+                    console.log(JSON.stringify(json));
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0]).toBe(253531.13052374928);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1]).toBe(909838.9305578759);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     it('Test Point projection', function () { return __awaiter(void 0, void 0, void 0, function () {
         var projector, json;
         return __generator(this, function (_a) {

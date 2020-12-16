@@ -1,6 +1,7 @@
 import { __awaiter, __generator } from "tslib";
 import proj4 from "proj4";
 import { deepCopy } from "./deep-copy";
+import * as https from "https";
 /**
  * A simple Reprojection class that works with Proj4 for
  * simplifying reprojection of GeoJson objects.
@@ -69,7 +70,7 @@ var ReProjector = /** @class */ (function () {
      * @param definition The proj4 definition string
      */
     ReProjector.prototype.addDefinition = function (code, definition) {
-        console.debug("Adding definition " + code);
+        console.debug("Adding definition " + code + " - " + definition);
         proj4.defs(code, definition);
         return this;
     };
@@ -100,6 +101,43 @@ var ReProjector = /** @class */ (function () {
         console.debug("Projecting to " + to);
         this.toProjection = to;
         return this;
+    };
+    /**
+     * Will attempt to load a proj4 definition from epsg.io
+     * @param epsgCode An EPSG Code, 3005 or EPSG:3005
+     */
+    ReProjector.prototype.addDefinitionFromEpsgIo = function (epsgCode) {
+        return __awaiter(this, void 0, void 0, function () {
+            var code, newDef;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        code = epsgCode.trim().includes(':') ? epsgCode.split(':')[1].trim() : epsgCode.trim();
+                        return [4 /*yield*/, new Promise(function (resolve, reject) {
+                                https.get("https://epsg.io/" + code + ".proj4", function (resp) {
+                                    var data = '';
+                                    resp.on('data', function (chunk) {
+                                        data += chunk;
+                                    });
+                                    resp.on('end', function () {
+                                        resolve(data);
+                                    });
+                                }).on("error", function (err) {
+                                    reject(err);
+                                });
+                            })];
+                    case 1:
+                        newDef = _a.sent();
+                        if (newDef && newDef.length > 0) {
+                            this.addDefinition(epsgCode, newDef);
+                        }
+                        else {
+                            throw new Error("Could not find definition for \"" + epsgCode + "\"");
+                        }
+                        return [2 /*return*/, newDef];
+                }
+            });
+        });
     };
     /**
      * Run the projection. This function is asyncronous and will

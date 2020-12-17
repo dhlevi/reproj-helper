@@ -80,9 +80,8 @@ These include:
 - Polygon Perimeter (in meters)
 - Polygon Area (in meters squared)
 - Coordinate precision reducer
-- Find and/or Remove interior rings from a polygon
-- Bounding Box of Features, FeatureCollections
-- Basic converter for WKT (See the FormatConverter class)
+- Spatial Transformations (See the `SpatialTransformers` class)
+- Basic converter for WKT (See the `FormatConverter` class)
 
 ## Format Converter
 
@@ -108,6 +107,32 @@ const wkt = converter.fromGeoJson(sourceWkt).toWkt()
 ```
 
 You can supply `FeatureCollection`, `GeometryCollection`, `Feature` or `Geometry`. FeatureCollections will convert to a WKT `GEOMETRYCOLLECTION`. Converting to GeoJSON will result in `Feature` objects being returned. Converting WKT `GEOMETRYCOLLECTION` will result in a `Feature` GeoJSON, with a geometry type of `GeometryCollection`
+
+## Spatial Transformers
+
+There's an addition to the spatial utils class called `SpatialTransformers`. This utility class contains functions that generate new features or modified versions of features from supplied input geometry. These functions include
+
+- Find and/or Remove interior rings from a polygon
+- Bounding Box of Features and FeatureCollections
+- Create a centroid for a feature
+- Reduce precision for a feature
+
+### Transformers Usage
+
+Should be pretty familiar by now. This is a static class, so no need to instantiate:
+
+```typescript
+const sourceWkt = 'POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))'
+const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
+
+const interiorRings = SpatialTransformers.findInteriorRings(json)
+
+const modifiedFeature = SpatialTransformers.removeInteriorRings(json)
+
+const bbox = SpatialTransformers.boundingBox(json)
+
+// etc. etc. etc.
+```
 
 ## Thanks!
 

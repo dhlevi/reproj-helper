@@ -1,5 +1,7 @@
-import { __awaiter, __generator } from "tslib";
-import { deepCopy } from './deep-copy';
+/**
+ * A Utilities class containing functions for performing various
+ * helpful utilities, like distance calculations, UTM zone helpers, etc.
+ */
 var SpatialUtils = /** @class */ (function () {
     function SpatialUtils() {
     }
@@ -79,6 +81,7 @@ var SpatialUtils = /** @class */ (function () {
      * Calculate the distance between two points in Metres, using the haversine formula
      * @param startCoord Starting coordinates
      * @param endCoord Ending coordinates
+     * @returns the distance from the start coordinate to the end coordinate
      */
     SpatialUtils.haversineDistance = function (startCoord, endCoord) {
         var latRads = this.degreesToRadians(endCoord[1] - startCoord[1]);
@@ -93,6 +96,7 @@ var SpatialUtils = /** @class */ (function () {
      * Calculate the length of a linestring in metres, using the
      * Haversine distance method. MultiLinestring distances will not be separated
      * @param line The linestring to calculate a length for
+     * @returns the length of the line in metres
      */
     SpatialUtils.lineLength = function (line) {
         var distance = 0;
@@ -117,6 +121,7 @@ var SpatialUtils = /** @class */ (function () {
      * Calculate the perimetre for a polygon in metres, using
      * the haversine method. MultiPolygon perimetres will not be separated
      * @param polygon the polygon to calculate the perimetre for
+     * @returns the perimetre of the polygon in metres
      */
     SpatialUtils.polygonPerimeter = function (polygon) {
         var distance = 0;
@@ -151,6 +156,7 @@ var SpatialUtils = /** @class */ (function () {
      * Calculates the area of a polygon in metres squared.
      * Multipolygon features will not have their areas separated.
      * @param polygon The polygon to calculate the area for
+     * @returns the area of the polygon in metres squared
      */
     SpatialUtils.polygonArea = function (polygon) {
         var area = 0;
@@ -208,6 +214,7 @@ var SpatialUtils = /** @class */ (function () {
     /**
      * Convert decimal degrees to radians
      * @param degrees the decimal degrees
+     * @returns the degree in radians
      */
     SpatialUtils.degreesToRadians = function (degrees) {
         return (degrees * Math.PI) / 180;
@@ -216,156 +223,20 @@ var SpatialUtils = /** @class */ (function () {
      * Reduces the precision of a number
      * @param coord The number to reduce
      * @param reduceTo How many decimals to reduce it to
+     * @returns a precision reduced number
      */
     SpatialUtils.reducePrecision = function (coord, reduceTo) {
         return parseFloat(coord.toFixed(reduceTo));
     };
+    /**
+     * Reduce the precision of a coordinate. This will return a new coordinate
+     * and not alter the supplied coordinate
+     * @param coords The coordinate to reduce precision for
+     * @param reduceTo How many decimal places to reduce to
+     * @returns A precision-reduced Position
+     */
     SpatialUtils.reduceCoordinatePrecision = function (coords, reduceTo) {
         return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)];
-    };
-    /**
-     * Given a GeoJSON polygon feature, return copies of the interior rings
-     * as polygons. This will not alter the provided geometry.
-     * @param feature The feature to find interior rings in
-     */
-    SpatialUtils.findInteriorRings = function (feature) {
-        return __awaiter(this, void 0, void 0, function () {
-            var polys, geometry, i, _i, _a, childGeom, i;
-            return __generator(this, function (_b) {
-                polys = [];
-                geometry = feature.type === 'Feature' ? feature.geometry : feature;
-                if (geometry.type === 'Polygon') {
-                    for (i = 1; i < geometry.coordinates.length; i++) {
-                        polys.push({
-                            type: 'Polygon',
-                            coordinates: [geometry.coordinates[i]]
-                        });
-                    }
-                }
-                else if (geometry.type === 'MultiPolygon') {
-                    for (_i = 0, _a = geometry.coordinates; _i < _a.length; _i++) {
-                        childGeom = _a[_i];
-                        for (i = 1; i < childGeom.length; i++) {
-                            polys.push({
-                                type: 'Polygon',
-                                coordinates: [childGeom[i]]
-                            });
-                        }
-                    }
-                }
-                return [2 /*return*/, polys];
-            });
-        });
-    };
-    /**
-   * Given a GeoJSON polygon feature, locate and extract the interior rings
-   * A new geometry without interior rings will be returned. This will not alter the provided geometry.
-   * @param feature The feature to find interior rings in
-   */
-    SpatialUtils.removeInteriorRings = function (feature) {
-        return __awaiter(this, void 0, void 0, function () {
-            var clone, geometry, i;
-            return __generator(this, function (_a) {
-                clone = deepCopy(feature);
-                geometry = clone.type === 'Feature' ? clone.geometry : feature;
-                if (geometry.type === 'Polygon') {
-                    geometry.coordinates = [geometry.coordinates[0]];
-                }
-                else if (geometry.type === 'MultiPolygon') {
-                    for (i = 0; i < geometry.coordinates.length; i++) {
-                        geometry.coordinates[i] = [geometry.coordinates[i][0]];
-                    }
-                }
-                if (clone.type === 'Feature') {
-                    clone.geometry = geometry;
-                }
-                return [2 /*return*/, clone];
-            });
-        });
-    };
-    SpatialUtils.boundingBox = function (features) {
-        // if we didn't pass in an array, make it one anyway
-        // so we can process the same way below
-        if (!Array.isArray(features)) {
-            if (features.type === 'FeatureCollection') {
-                features = features.features;
-            }
-            else {
-                features = [features];
-            }
-        }
-        var minX = Infinity;
-        var maxX = -Infinity;
-        var minY = Infinity;
-        var maxY = -Infinity;
-        for (var _i = 0, features_1 = features; _i < features_1.length; _i++) {
-            var feature = features_1[_i];
-            var geometry 
-            // if we have a geometry collection, then get its bbox as a polygon
-            = void 0;
-            // if we have a geometry collection, then get its bbox as a polygon
-            if (feature.geometry.type === 'GeometryCollection') {
-                geometry = this.boundingBox(feature.geometry.geometries.map(function (geom) { return { type: 'Feature', geometry: geom, properties: {} }; }));
-            }
-            else {
-                geometry = feature.geometry;
-            }
-            switch (geometry.type) {
-                case 'Point': {
-                    minX = minX > geometry.coordinates[0] ? geometry.coordinates[0] : minX;
-                    maxX = maxX < geometry.coordinates[0] ? geometry.coordinates[0] : maxX;
-                    minY = minY > geometry.coordinates[1] ? geometry.coordinates[1] : minY;
-                    maxY = maxY < geometry.coordinates[1] ? geometry.coordinates[1] : maxY;
-                    break;
-                }
-                case 'LineString':
-                case 'MultiPoint': {
-                    for (var _a = 0, _b = geometry.coordinates; _a < _b.length; _a++) {
-                        var coord = _b[_a];
-                        minX = minX > coord[0] ? coord[0] : minX;
-                        maxX = maxX < coord[0] ? coord[0] : maxX;
-                        minY = minY > coord[1] ? coord[1] : minY;
-                        maxY = maxY < coord[1] ? coord[1] : maxY;
-                    }
-                    break;
-                }
-                case 'MultiLineString':
-                case 'Polygon': {
-                    for (var _c = 0, _d = geometry.coordinates; _c < _d.length; _c++) {
-                        var ring = _d[_c];
-                        for (var _e = 0, ring_2 = ring; _e < ring_2.length; _e++) {
-                            var coord = ring_2[_e];
-                            minX = minX > coord[0] ? coord[0] : minX;
-                            maxX = maxX < coord[0] ? coord[0] : maxX;
-                            minY = minY > coord[1] ? coord[1] : minY;
-                            maxY = maxY < coord[1] ? coord[1] : maxY;
-                        }
-                    }
-                    break;
-                }
-                case 'MultiPolygon': {
-                    for (var _f = 0, _g = geometry.coordinates; _f < _g.length; _f++) {
-                        var poly = _g[_f];
-                        for (var _h = 0, poly_2 = poly; _h < poly_2.length; _h++) {
-                            var ring = poly_2[_h];
-                            for (var _j = 0, ring_3 = ring; _j < ring_3.length; _j++) {
-                                var coord = ring_3[_j];
-                                minX = minX > coord[0] ? coord[0] : minX;
-                                maxX = maxX < coord[0] ? coord[0] : maxX;
-                                minY = minY > coord[1] ? coord[1] : minY;
-                                maxY = maxY < coord[1] ? coord[1] : maxY;
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        return {
-            type: 'Polygon',
-            bbox: [minX, minY, maxX, maxY],
-            coordinates: [[[minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY], [minX, maxY]]]
-        };
     };
     SpatialUtils.RADIUS = 6378137;
     return SpatialUtils;

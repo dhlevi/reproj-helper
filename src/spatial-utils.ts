@@ -1,6 +1,9 @@
-import { deepCopy } from './deep-copy';
-import { Feature, FeatureCollection, Geometry, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
+import { LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
 
+/**
+ * A Utilities class containing functions for performing various
+ * helpful utilities, like distance calculations, UTM zone helpers, etc.
+ */
 export class SpatialUtils {
   public static readonly RADIUS = 6378137
   /**
@@ -81,6 +84,7 @@ export class SpatialUtils {
    * Calculate the distance between two points in Metres, using the haversine formula
    * @param startCoord Starting coordinates
    * @param endCoord Ending coordinates
+   * @returns the distance from the start coordinate to the end coordinate
    */
   public static haversineDistance (startCoord: Position, endCoord: Position): number {
     const latRads = this.degreesToRadians(endCoord[1] - startCoord[1])
@@ -98,6 +102,7 @@ export class SpatialUtils {
    * Calculate the length of a linestring in metres, using the
    * Haversine distance method. MultiLinestring distances will not be separated
    * @param line The linestring to calculate a length for
+   * @returns the length of the line in metres
    */
   public static lineLength (line: LineString | MultiLineString): number {
     let distance = 0
@@ -123,6 +128,7 @@ export class SpatialUtils {
    * Calculate the perimetre for a polygon in metres, using
    * the haversine method. MultiPolygon perimetres will not be separated
    * @param polygon the polygon to calculate the perimetre for
+   * @returns the perimetre of the polygon in metres
    */
   public static polygonPerimeter (polygon: Polygon | MultiPolygon): number {
     let distance = 0
@@ -157,6 +163,7 @@ export class SpatialUtils {
    * Calculates the area of a polygon in metres squared.
    * Multipolygon features will not have their areas separated.
    * @param polygon The polygon to calculate the area for
+   * @returns the area of the polygon in metres squared
    */
   public static polygonArea (polygon: Polygon | MultiPolygon): number {
     let area = 0
@@ -220,7 +227,8 @@ export class SpatialUtils {
 
   /**
    * Convert decimal degrees to radians
-   * @param degrees the decimal degrees 
+   * @param degrees the decimal degrees
+   * @returns the degree in radians
    */
   public static degreesToRadians(degrees: number): number {
     return (degrees * Math.PI) / 180;
@@ -230,143 +238,20 @@ export class SpatialUtils {
    * Reduces the precision of a number
    * @param coord The number to reduce
    * @param reduceTo How many decimals to reduce it to
+   * @returns a precision reduced number
    */
   public static reducePrecision (coord: number, reduceTo: number): number {
     return parseFloat(coord.toFixed(reduceTo))
   }
 
+  /**
+   * Reduce the precision of a coordinate. This will return a new coordinate
+   * and not alter the supplied coordinate
+   * @param coords The coordinate to reduce precision for
+   * @param reduceTo How many decimal places to reduce to
+   * @returns A precision-reduced Position
+   */
   public static reduceCoordinatePrecision (coords: Position, reduceTo: number): Position {
     return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)]
-  }
-
-  /**
-   * Given a GeoJSON polygon feature, return copies of the interior rings
-   * as polygons. This will not alter the provided geometry.
-   * @param feature The feature to find interior rings in
-   */
-  public static async findInteriorRings (feature: Feature | Polygon | MultiPolygon): Promise<Polygon[]> {
-    const polys: Array<Polygon> = []
-    const geometry = feature.type === 'Feature' ? feature.geometry : feature
-
-    if (geometry.type === 'Polygon') {
-      for (let i = 1; i < geometry.coordinates.length; i++) {
-        polys.push({
-          type: 'Polygon',
-          coordinates: [geometry.coordinates[i]]
-        })
-      }
-    } else if (geometry.type === 'MultiPolygon') {
-      for (const childGeom of geometry.coordinates) {
-        for (let i = 1; i < childGeom.length; i++) {
-          polys.push({
-            type: 'Polygon',
-            coordinates: [childGeom[i]]
-          })
-        }
-      }
-    }
-
-    return polys
-  }
-
-    /**
-   * Given a GeoJSON polygon feature, locate and extract the interior rings
-   * A new geometry without interior rings will be returned. This will not alter the provided geometry.
-   * @param feature The feature to find interior rings in
-   */
-   public static async removeInteriorRings (feature: Feature | Polygon | MultiPolygon): Promise<Feature | Polygon | MultiPolygon> {
-    const clone = deepCopy(feature)
-    const geometry = clone.type === 'Feature' ? clone.geometry : feature
-
-    if (geometry.type === 'Polygon') {
-      geometry.coordinates = [geometry.coordinates[0]]
-    } else if (geometry.type === 'MultiPolygon') {
-      for (let i = 0; i < geometry.coordinates.length; i++) {
-        geometry.coordinates[i] = [geometry.coordinates[i][0]]
-      }
-    }
-
-    if (clone.type === 'Feature') {
-      clone.geometry = geometry as Geometry
-    }
-
-    return clone
-  }
-
-  public static boundingBox (features: FeatureCollection | Feature | Feature[]): Polygon {
-    // if we didn't pass in an array, make it one anyway
-    // so we can process the same way below
-    if (!Array.isArray(features)) {
-      if (features.type === 'FeatureCollection') {
-        features = features.features
-      } else {
-        features = [features]
-      }
-    }
-
-    let minX = Infinity
-    let maxX = -Infinity
-    let minY = Infinity
-    let maxY = -Infinity
-    for (const feature of features) {
-      let geometry
-      // if we have a geometry collection, then get its bbox as a polygon
-      if (feature.geometry.type === 'GeometryCollection') {
-        geometry = this.boundingBox(feature.geometry.geometries.map(geom => { return { type: 'Feature', geometry: geom, properties: {} } }))
-      } else {
-        geometry = feature.geometry
-      }
-
-      switch (geometry.type) {
-        case 'Point': {
-          minX = minX > geometry.coordinates[0] ? geometry.coordinates[0] : minX
-          maxX = maxX < geometry.coordinates[0] ? geometry.coordinates[0] : maxX
-          minY = minY > geometry.coordinates[1] ? geometry.coordinates[1] : minY
-          maxY = maxY < geometry.coordinates[1] ? geometry.coordinates[1] : maxY
-          break
-        }
-        case 'LineString':
-        case 'MultiPoint': {
-          for (const coord of geometry.coordinates) {
-            minX = minX > coord[0] ? coord[0] : minX
-            maxX = maxX < coord[0] ? coord[0] : maxX
-            minY = minY > coord[1] ? coord[1] : minY
-            maxY = maxY < coord[1] ? coord[1] : maxY
-          }
-          break
-        }
-        case 'MultiLineString':
-        case 'Polygon': {
-          for (const ring of geometry.coordinates) {
-            for (const coord of ring) {
-              minX = minX > coord[0] ? coord[0] : minX
-              maxX = maxX < coord[0] ? coord[0] : maxX
-              minY = minY > coord[1] ? coord[1] : minY
-              maxY = maxY < coord[1] ? coord[1] : maxY
-            }
-          }
-          break
-        }
-        case 'MultiPolygon': {
-          for (const poly of geometry.coordinates) {
-            for (const ring of poly) {
-              for (const coord of ring) {
-                minX = minX > coord[0] ? coord[0] : minX
-                maxX = maxX < coord[0] ? coord[0] : maxX
-                minY = minY > coord[1] ? coord[1] : minY
-                maxY = maxY < coord[1] ? coord[1] : maxY
-              }
-            }
-          }
-          break
-        }
-      }
-    }
-
-    return {
-      type: 'Polygon',
-      bbox: [minX, minY, maxX, maxY],
-      coordinates: [[[minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY], [minX, maxY]]]
-    }
   }
 }

@@ -1,5 +1,6 @@
-import { Feature, MultiPolygon, Polygon, Position } from "geojson";
+import { Feature, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
 export declare class SpatialUtils {
+    static readonly RADIUS = 6378137;
     /**
      * Returns the UTM Zone for a given longitude. Includes rules beyond just BC/Canada
      * @param latitude The Latitude. Needed to determine zones with special rules (Svalbard)
@@ -40,6 +41,40 @@ export declare class SpatialUtils {
      * @param endCoord Ending coordinates
      */
     static haversineDistance(startCoord: Position, endCoord: Position): number;
+    /**
+     * Calculate the length of a linestring in metres, using the
+     * Haversine distance method. MultiLinestring distances will not be separated
+     * @param line The linestring to calculate a length for
+     */
+    static lineLength(line: LineString | MultiLineString): number;
+    /**
+     * Calculate the perimetre for a polygon in metres, using
+     * the haversine method. MultiPolygon perimetres will not be separated
+     * @param polygon the polygon to calculate the perimetre for
+     */
+    static polygonPerimeter(polygon: Polygon | MultiPolygon): number;
+    /**
+     * Calculates the area of a polygon in metres squared.
+     * Mulitpolygon features will not have their areas separated.
+     * @param polygon The polygon to calculate the area for
+     */
+    static polygonArea(polygon: Polygon | MultiPolygon): number;
+    /**
+     * @private
+     * Reference:
+     * Robert. G. Chamberlain and William H. Duquette, "Some Algorithms for Polygons on a Sphere",
+     * JPL Publication 07-03, Jet Propulsion
+     * Laboratory, Pasadena, CA, June 2007 https://trs.jpl.nasa.gov/handle/2014/40409
+     *
+     * @param ring the polygon ring to calculate
+     * @returns The area of the ring in metres squared
+     */
+    private static polygonRingArea;
+    /**
+     * Convert decimal degrees to radians
+     * @param degrees the decimal degrees
+     */
+    static degreesToRadians(degrees: number): number;
     /**
      * Reduces the precision of a number
      * @param coord The number to reduce

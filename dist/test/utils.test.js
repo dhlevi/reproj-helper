@@ -11,9 +11,26 @@ describe('spatial-utils.ts', function () {
     });
     it('Test Haversine Distance', function () {
         var distanceMS = SpatialUtils.haversineDistance([0, 0], [5, 5]);
-        expect(distanceMS).toBe(785767.2208422621);
+        expect(distanceMS).toBe(786647.4626653906);
         var reducedPrecision = SpatialUtils.reducePrecision(distanceMS, 3);
-        expect(reducedPrecision).toBe(785767.221);
+        expect(reducedPrecision).toBe(786647.463);
+    });
+    it('Test LineString Distance', function () {
+        var distanceMS = SpatialUtils.lineLength({
+            type: 'LineString',
+            coordinates: [[0, 0], [5, 5], [10, 10]]
+        });
+        expect(distanceMS).toBe(1570303.4399846792);
+    });
+    it('Test Polygon Perimetre and Area', function () {
+        var poly = {
+            type: 'Polygon',
+            coordinates: [[[125, -15], [113, -22], [154, -27], [144, -15], [125, -15]]]
+        };
+        var areaMS = SpatialUtils.polygonArea(poly);
+        var distanceMS = SpatialUtils.polygonPerimeter(poly);
+        expect(areaMS).toBe(3339946239196.927);
+        expect(distanceMS).toBe(9391624.93439981);
     });
     it('Test UTM utils', function () {
         var zone = SpatialUtils.utmZone(52.555, -122.123);
@@ -42,7 +59,7 @@ describe('spatial-utils.ts', function () {
                     cleanWkt = converter.fromGeoJson(cleanJson).toWkt();
                     expect(cleanWkt).toBe('POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10))');
                     multipolyWkt = 'MULTIPOLYGON (((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30)), (35 10, 45 45, 15 40, 10 20, 35 10))';
-                    multiPolyJson = converter.fromWkt(sourceWkt).toGeoJson();
+                    multiPolyJson = converter.fromWkt(multipolyWkt).toGeoJson();
                     return [4 /*yield*/, SpatialUtils.findInteriorRings(multiPolyJson)];
                 case 3:
                     mpRing = _a.sent();

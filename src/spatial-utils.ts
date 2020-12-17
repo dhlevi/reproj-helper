@@ -1,7 +1,8 @@
 import { deepCopy } from './deep-copy';
-import { Feature, Geometry, MultiPolygon, Polygon, Position } from "geojson";
+import { Feature, Geometry, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
 
 export class SpatialUtils {
+  public static readonly RADIUS = 6378137
   /**
    * Returns the UTM Zone for a given longitude. Includes rules beyond just BC/Canada
    * @param latitude The Latitude. Needed to determine zones with special rules (Svalbard)
@@ -82,17 +83,147 @@ export class SpatialUtils {
    * @param endCoord Ending coordinates
    */
   public static haversineDistance (startCoord: Position, endCoord: Position): number {
-    const radius = 6371000 // metres
-
-    const latRads = (endCoord[1] - startCoord[1]) * Math.PI / 180
-    const lonRads = (endCoord[0] - startCoord[0]) * Math.PI / 180
-    const lat1Rads = startCoord[1] * Math.PI / 180
-    const lat2Rads = endCoord[1] * Math.PI / 180
+    const latRads = this.degreesToRadians(endCoord[1] - startCoord[1])
+    const lonRads = this.degreesToRadians(endCoord[0] - startCoord[0])
+    const lat1Rads = this.degreesToRadians(startCoord[1])
+    const lat2Rads = this.degreesToRadians(endCoord[1])
 
     const a = Math.sin(latRads / 2) * Math.sin(latRads / 2) + Math.cos(lat1Rads) * Math.cos(lat2Rads) * Math.sin(lonRads / 2) * Math.sin(lonRads / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-    return radius * c;
+    return this.RADIUS * c;
+  }
+
+  /**
+   * Calculate the length of a linestring in metres, using the
+   * Haversine distance method. MultiLinestring distances will not be separated
+   * @param line The linestring to calculate a length for
+   */
+  public static lineLength (line: LineString | MultiLineString): number {
+    let distance = 0
+    
+    const lines = line.type === 'LineString' ? [line.coordinates] : line.coordinates
+
+    for (const linestring of lines) {
+      let lastCoord = null
+      for (const coord of linestring) {
+        if (!lastCoord) {
+          lastCoord = coord
+        } else {
+          distance += this.haversineDistance(lastCoord, coord)
+          lastCoord = coord
+        }
+      }
+    }
+
+    return distance
+  }
+
+  /**
+   * Calculate the perimetre for a polygon in metres, using
+   * the haversine method. MultiPolygon perimetres will not be separated
+   * @param polygon the polygon to calculate the perimetre for
+   */
+  public static polygonPerimeter (polygon: Polygon | MultiPolygon): number {
+    let distance = 0
+    
+    const polys = polygon.type === 'Polygon' ? [polygon.coordinates] : polygon.coordinates
+
+    for (const poly of polys) {
+      for (const ring of poly) {
+        let firstCoord = null
+        let lastCoord = null
+        for (const coord of ring) {
+          if (!lastCoord) {
+            firstCoord = coord
+            lastCoord = coord
+          } else {
+            distance += this.haversineDistance(lastCoord, coord)
+            lastCoord = coord
+          }
+        }
+        // if the json didn't include the final point linking to the first point
+        // make sure to add that to the distance.
+        if (lastCoord && firstCoord && (lastCoord[0] != firstCoord[0] || lastCoord[1] != firstCoord[1])) {
+          distance += this.haversineDistance(lastCoord, firstCoord)
+        }
+      }
+    }
+
+    return distance
+  }
+
+  /**
+   * Calculates the area of a polygon in metres squared.
+   * Mulitpolygon features will not have their areas separated.
+   * @param polygon The polygon to calculate the area for
+   */
+  public static polygonArea (polygon: Polygon | MultiPolygon): number {
+    let area = 0
+
+    const polys = polygon.type === 'Polygon' ? [polygon.coordinates] : polygon.coordinates
+
+    for (const poly of polys) {
+      for (let i = 0; i < poly.length; i++) {
+        const ringArea = Math.abs(this.polygonRingArea(poly[i]))
+        area += i === 0 ? ringArea : -ringArea
+      }
+    }
+
+    return area
+  }
+
+  /**
+   * @private
+   * Reference:
+   * Robert. G. Chamberlain and William H. Duquette, "Some Algorithms for Polygons on a Sphere",
+   * JPL Publication 07-03, Jet Propulsion
+   * Laboratory, Pasadena, CA, June 2007 https://trs.jpl.nasa.gov/handle/2014/40409
+   *
+   * @param ring the polygon ring to calculate
+   * @returns The area of the ring in metres squared
+   */
+  private static polygonRingArea (ring: Position[]): number {
+    let area = 0
+  
+    if (ring.length > 2) {
+      for (let i = 0; i < ring.length; i++) {
+        let lowerIndex
+        let middleIndex
+        let upperIndex
+
+        if (i === ring.length - 2) {
+          lowerIndex = ring.length - 2;
+          middleIndex = ring.length - 1;
+          upperIndex = 0
+        } else if (i === ring.length - 1) {
+          lowerIndex = ring.length - 1
+          middleIndex = 0
+          upperIndex = 1
+        } else {
+          lowerIndex = i
+          middleIndex = i + 1
+          upperIndex = i + 2
+        }
+
+        const point1 = ring[lowerIndex]
+        const point2 = ring[middleIndex]
+        const point3 = ring[upperIndex]
+
+        area += (this.degreesToRadians(point3[0]) - this.degreesToRadians(point1[0])) * Math.sin(this.degreesToRadians(point2[1]))
+      }
+      area = (area * this.RADIUS * this.RADIUS) / 2
+    }
+
+    return area
+  }
+
+  /**
+   * Convert decimal degrees to radians
+   * @param degrees the decimal degrees 
+   */
+  public static degreesToRadians(degrees: number): number {
+    return (degrees * Math.PI) / 180;
   }
 
   /**

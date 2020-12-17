@@ -1,5 +1,5 @@
 import { FormatConverter } from "../src/format-converter"
-import { Feature } from "geojson"
+import { Feature, Polygon } from "geojson"
 import { SpatialUtils } from "../src/spatial-utils"
 
 describe('spatial-utils.ts', () => {
@@ -13,10 +13,28 @@ describe('spatial-utils.ts', () => {
   })
   it('Test Haversine Distance', () => {
     const distanceMS = SpatialUtils.haversineDistance([0, 0], [5, 5])
-    expect(distanceMS).toBe(785767.2208422621)
+    expect(distanceMS).toBe(786647.4626653906)
 
     const reducedPrecision = SpatialUtils.reducePrecision(distanceMS, 3)
-    expect(reducedPrecision).toBe(785767.221)
+    expect(reducedPrecision).toBe(786647.463)
+  })
+  it('Test LineString Distance', () => {
+    const distanceMS = SpatialUtils.lineLength({
+      type: 'LineString',
+      coordinates: [[0, 0], [5, 5], [10, 10]]
+    })
+    expect(distanceMS).toBe(1570303.4399846792)
+  })
+  it('Test Polygon Perimetre and Area', () => {
+    const poly: Polygon = {
+      type: 'Polygon',
+      coordinates: [[[125, -15], [113, -22], [154, -27], [144, -15], [125, -15]]]
+    }
+    const areaMS = SpatialUtils.polygonArea(poly)
+    const distanceMS = SpatialUtils.polygonPerimeter(poly)
+
+    expect(areaMS).toBe(3339946239196.927)
+    expect(distanceMS).toBe(9391624.93439981)
   })
   it('Test UTM utils', () => {
     const zone = SpatialUtils.utmZone(52.555, -122.123)

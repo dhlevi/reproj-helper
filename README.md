@@ -70,6 +70,9 @@ These include:
 - Find your UTM letter code by latitude
 - Convert Decimal Degrees to a DMS String
 - Haversine distance
+- Line length (in meters)
+- Polygon Perimeter (in meters)
+- Polygon Area (in meters squared)
 - Coordinate precision reducer
 - Find and/or Remove interior rings from a polygon
 - Basic converter for WKT (See the FormatConverter class)

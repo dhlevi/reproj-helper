@@ -81,14 +81,136 @@ var SpatialUtils = /** @class */ (function () {
      * @param endCoord Ending coordinates
      */
     SpatialUtils.haversineDistance = function (startCoord, endCoord) {
-        var radius = 6371000; // metres
-        var latRads = (endCoord[1] - startCoord[1]) * Math.PI / 180;
-        var lonRads = (endCoord[0] - startCoord[0]) * Math.PI / 180;
-        var lat1Rads = startCoord[1] * Math.PI / 180;
-        var lat2Rads = endCoord[1] * Math.PI / 180;
+        var latRads = this.degreesToRadians(endCoord[1] - startCoord[1]);
+        var lonRads = this.degreesToRadians(endCoord[0] - startCoord[0]);
+        var lat1Rads = this.degreesToRadians(startCoord[1]);
+        var lat2Rads = this.degreesToRadians(endCoord[1]);
         var a = Math.sin(latRads / 2) * Math.sin(latRads / 2) + Math.cos(lat1Rads) * Math.cos(lat2Rads) * Math.sin(lonRads / 2) * Math.sin(lonRads / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return radius * c;
+        return this.RADIUS * c;
+    };
+    /**
+     * Calculate the length of a linestring in metres, using the
+     * Haversine distance method. MultiLinestring distances will not be separated
+     * @param line The linestring to calculate a length for
+     */
+    SpatialUtils.lineLength = function (line) {
+        var distance = 0;
+        var lines = line.type === 'LineString' ? [line.coordinates] : line.coordinates;
+        for (var _i = 0, lines_1 = lines; _i < lines_1.length; _i++) {
+            var linestring = lines_1[_i];
+            var lastCoord = null;
+            for (var _a = 0, linestring_1 = linestring; _a < linestring_1.length; _a++) {
+                var coord = linestring_1[_a];
+                if (!lastCoord) {
+                    lastCoord = coord;
+                }
+                else {
+                    distance += this.haversineDistance(lastCoord, coord);
+                    lastCoord = coord;
+                }
+            }
+        }
+        return distance;
+    };
+    /**
+     * Calculate the perimetre for a polygon in metres, using
+     * the haversine method. MultiPolygon perimetres will not be separated
+     * @param polygon the polygon to calculate the perimetre for
+     */
+    SpatialUtils.polygonPerimeter = function (polygon) {
+        var distance = 0;
+        var polys = polygon.type === 'Polygon' ? [polygon.coordinates] : polygon.coordinates;
+        for (var _i = 0, polys_1 = polys; _i < polys_1.length; _i++) {
+            var poly = polys_1[_i];
+            for (var _a = 0, poly_1 = poly; _a < poly_1.length; _a++) {
+                var ring = poly_1[_a];
+                var firstCoord = null;
+                var lastCoord = null;
+                for (var _b = 0, ring_1 = ring; _b < ring_1.length; _b++) {
+                    var coord = ring_1[_b];
+                    if (!lastCoord) {
+                        firstCoord = coord;
+                        lastCoord = coord;
+                    }
+                    else {
+                        distance += this.haversineDistance(lastCoord, coord);
+                        lastCoord = coord;
+                    }
+                }
+                // if the json didn't include the final point linking to the first point
+                // make sure to add that to the distance.
+                if (lastCoord && firstCoord && (lastCoord[0] != firstCoord[0] || lastCoord[1] != firstCoord[1])) {
+                    distance += this.haversineDistance(lastCoord, firstCoord);
+                }
+            }
+        }
+        return distance;
+    };
+    /**
+     * Calculates the area of a polygon in metres squared.
+     * Mulitpolygon features will not have their areas separated.
+     * @param polygon The polygon to calculate the area for
+     */
+    SpatialUtils.polygonArea = function (polygon) {
+        var area = 0;
+        var polys = polygon.type === 'Polygon' ? [polygon.coordinates] : polygon.coordinates;
+        for (var _i = 0, polys_2 = polys; _i < polys_2.length; _i++) {
+            var poly = polys_2[_i];
+            for (var i = 0; i < poly.length; i++) {
+                var ringArea = Math.abs(this.polygonRingArea(poly[i]));
+                area += i === 0 ? ringArea : -ringArea;
+            }
+        }
+        return area;
+    };
+    /**
+     * @private
+     * Reference:
+     * Robert. G. Chamberlain and William H. Duquette, "Some Algorithms for Polygons on a Sphere",
+     * JPL Publication 07-03, Jet Propulsion
+     * Laboratory, Pasadena, CA, June 2007 https://trs.jpl.nasa.gov/handle/2014/40409
+     *
+     * @param ring the polygon ring to calculate
+     * @returns The area of the ring in metres squared
+     */
+    SpatialUtils.polygonRingArea = function (ring) {
+        var area = 0;
+        if (ring.length > 2) {
+            for (var i = 0; i < ring.length; i++) {
+                var lowerIndex = void 0;
+                var middleIndex = void 0;
+                var upperIndex = void 0;
+                if (i === ring.length - 2) {
+                    lowerIndex = ring.length - 2;
+                    middleIndex = ring.length - 1;
+                    upperIndex = 0;
+                }
+                else if (i === ring.length - 1) {
+                    lowerIndex = ring.length - 1;
+                    middleIndex = 0;
+                    upperIndex = 1;
+                }
+                else {
+                    lowerIndex = i;
+                    middleIndex = i + 1;
+                    upperIndex = i + 2;
+                }
+                var point1 = ring[lowerIndex];
+                var point2 = ring[middleIndex];
+                var point3 = ring[upperIndex];
+                area += (this.degreesToRadians(point3[0]) - this.degreesToRadians(point1[0])) * Math.sin(this.degreesToRadians(point2[1]));
+            }
+            area = (area * this.RADIUS * this.RADIUS) / 2;
+        }
+        return area;
+    };
+    /**
+     * Convert decimal degrees to radians
+     * @param degrees the decimal degrees
+     */
+    SpatialUtils.degreesToRadians = function (degrees) {
+        return (degrees * Math.PI) / 180;
     };
     /**
      * Reduces the precision of a number
@@ -161,6 +283,7 @@ var SpatialUtils = /** @class */ (function () {
             });
         });
     };
+    SpatialUtils.RADIUS = 6378137;
     return SpatialUtils;
 }());
 export { SpatialUtils };

@@ -1,3 +1,5 @@
+import { __awaiter, __generator } from "tslib";
+import { deepCopy } from './deep-copy';
 var SpatialUtils = /** @class */ (function () {
     function SpatialUtils() {
     }
@@ -98,6 +100,66 @@ var SpatialUtils = /** @class */ (function () {
     };
     SpatialUtils.reduceCoordinatePrecision = function (coords, reduceTo) {
         return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)];
+    };
+    /**
+     * Given a GeoJSON polygon feature, return copies of the interior rings
+     * as polygons. This will not alter the provided geometry.
+     * @param feature The feature to find interior rings in
+     */
+    SpatialUtils.findInteriorRings = function (feature) {
+        return __awaiter(this, void 0, void 0, function () {
+            var polys, geometry, i, _i, _a, childGeom, i;
+            return __generator(this, function (_b) {
+                polys = [];
+                geometry = feature.type === 'Feature' ? feature.geometry : feature;
+                if (geometry.type === 'Polygon') {
+                    for (i = 1; i < geometry.coordinates.length; i++) {
+                        polys.push({
+                            type: 'Polygon',
+                            coordinates: [geometry.coordinates[i]]
+                        });
+                    }
+                }
+                else if (geometry.type === 'MultiPolygon') {
+                    for (_i = 0, _a = geometry.coordinates; _i < _a.length; _i++) {
+                        childGeom = _a[_i];
+                        for (i = 1; i < childGeom.length; i++) {
+                            polys.push({
+                                type: 'Polygon',
+                                coordinates: [childGeom[i]]
+                            });
+                        }
+                    }
+                }
+                return [2 /*return*/, polys];
+            });
+        });
+    };
+    /**
+   * Given a GeoJSON polygon feature, locate and extract the interior rings
+   * A new geometry without interior rings will be returned. This will not alter the provided geometry.
+   * @param feature The feature to find interior rings in
+   */
+    SpatialUtils.removeInteriorRings = function (feature) {
+        return __awaiter(this, void 0, void 0, function () {
+            var clone, geometry, i;
+            return __generator(this, function (_a) {
+                clone = deepCopy(feature);
+                geometry = clone.type === 'Feature' ? clone.geometry : feature;
+                if (geometry.type === 'Polygon') {
+                    geometry.coordinates = [geometry.coordinates[0]];
+                }
+                else if (geometry.type === 'MultiPolygon') {
+                    for (i = 0; i < geometry.coordinates.length; i++) {
+                        geometry.coordinates[i] = [geometry.coordinates[i][0]];
+                    }
+                }
+                if (clone.type === 'Feature') {
+                    clone.geometry = geometry;
+                }
+                return [2 /*return*/, clone];
+            });
+        });
     };
     return SpatialUtils;
 }());

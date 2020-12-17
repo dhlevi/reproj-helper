@@ -1,3 +1,5 @@
+import { FormatConverter } from "../src/format-converter"
+import { Feature } from "geojson"
 import { SpatialUtils } from "../src/spatial-utils"
 
 describe('spatial-utils.ts', () => {
@@ -22,5 +24,36 @@ describe('spatial-utils.ts', () => {
 
     const zoneString = SpatialUtils.utmZoneString(52.555, -122.123)
     expect(zoneString).toBe(`UTM${zone}U`)
+  })
+  it('Test interior ring find/remove', async () => {
+    const converter = new FormatConverter()
+    const sourceWkt = 'POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))'
+    const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
+    
+    const ring = await SpatialUtils.findInteriorRings(json)
+
+    expect(ring[0].coordinates[0][0][0]).toBe(20)
+    expect(ring[0].coordinates[0][0][1]).toBe(30)
+    
+    const ringWkt = converter.fromGeoJson(ring[0]).toWkt()
+
+    expect(ringWkt).toBe('POLYGON ((20 30, 35 35, 30 20, 20 30))')
+
+    const cleanJson = await SpatialUtils.removeInteriorRings(json)
+    const cleanWkt = converter.fromGeoJson(cleanJson).toWkt()
+
+    expect(cleanWkt).toBe('POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10))')
+
+    const multipolyWkt = 'MULTIPOLYGON (((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30)), (35 10, 45 45, 15 40, 10 20, 35 10))'
+    const multiPolyJson = converter.fromWkt(multipolyWkt).toGeoJson() as Feature
+
+    const mpRing = await SpatialUtils.findInteriorRings(multiPolyJson)
+
+    expect(mpRing[0].coordinates[0][0][0]).toBe(20)
+    expect(mpRing[0].coordinates[0][0][1]).toBe(30)
+    
+    const mpRingWkt = converter.fromGeoJson(mpRing[0]).toWkt()
+
+    expect(mpRingWkt).toBe('POLYGON ((20 30, 35 35, 30 20, 20 30))')
   })
 })

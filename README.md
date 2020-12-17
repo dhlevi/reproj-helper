@@ -60,8 +60,6 @@ projector.addDefinitionFromEpsgIo('EPSG:2154')
 
 Pretty simple! Use the static initializer if you're running a one-off projection, and instantiate an object if you'll be doing a bunch.
 
-
-
 ### Got anything else?
 
 Yeah, there's a few helper methods also included in the `spatial-utils` static class
@@ -73,6 +71,7 @@ These include:
 - Convert Decimal Degrees to a DMS String
 - Haversine distance
 - Coordinate precision reducer
+- Find and/or Remove interior rings from a polygon
 - Basic converter for WKT (See the FormatConverter class)
 
 ## Format Converter

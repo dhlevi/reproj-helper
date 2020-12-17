@@ -1,4 +1,4 @@
-import { Position } from "geojson";
+import { Feature, MultiPolygon, Polygon, Position } from "geojson";
 export declare class SpatialUtils {
     /**
      * Returns the UTM Zone for a given longitude. Includes rules beyond just BC/Canada
@@ -47,4 +47,16 @@ export declare class SpatialUtils {
      */
     static reducePrecision(coord: number, reduceTo: number): number;
     static reduceCoordinatePrecision(coords: Position, reduceTo: number): Position;
+    /**
+     * Given a GeoJSON polygon feature, return copies of the interior rings
+     * as polygons. This will not alter the provided geometry.
+     * @param feature The feature to find interior rings in
+     */
+    static findInteriorRings(feature: Feature | Polygon | MultiPolygon): Promise<Polygon[]>;
+    /**
+   * Given a GeoJSON polygon feature, locate and extract the interior rings
+   * A new geometry without interior rings will be returned. This will not alter the provided geometry.
+   * @param feature The feature to find interior rings in
+   */
+    static removeInteriorRings(feature: Feature | Polygon | MultiPolygon): Promise<Feature | Polygon | MultiPolygon>;
 }

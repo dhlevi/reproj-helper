@@ -16,7 +16,6 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:2154').project()];
                 case 2:
                     json = _a.sent();
-                    console.log(JSON.stringify(json));
                     expect(json === null || json === void 0 ? void 0 : json.coordinates[0]).toBe(253531.13052374928);
                     expect(json === null || json === void 0 ? void 0 : json.coordinates[1]).toBe(909838.9305578759);
                     return [2 /*return*/];

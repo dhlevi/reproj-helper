@@ -10,7 +10,7 @@ describe('Reprojector.ts', () => {
       type: 'Point',
       coordinates:[0, 0]
     }).from('WGS84').to('EPSG:2154').project()
-    console.log(JSON.stringify(json))
+
     expect(json?.coordinates[0]).toBe(253531.13052374928)
     expect(json?.coordinates[1]).toBe(909838.9305578759)
   })

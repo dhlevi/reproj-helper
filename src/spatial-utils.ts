@@ -1,4 +1,5 @@
-import { Position } from "geojson";
+import { deepCopy } from './deep-copy';
+import { Feature, Geometry, MultiPolygon, Polygon, Position } from "geojson";
 
 export class SpatialUtils {
   /**
@@ -105,5 +106,59 @@ export class SpatialUtils {
 
   public static reduceCoordinatePrecision (coords: Position, reduceTo: number): Position {
     return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)]
+  }
+
+  /**
+   * Given a GeoJSON polygon feature, return copies of the interior rings
+   * as polygons. This will not alter the provided geometry.
+   * @param feature The feature to find interior rings in
+   */
+  public static async findInteriorRings (feature: Feature | Polygon | MultiPolygon): Promise<Polygon[]> {
+    const polys: Array<Polygon> = []
+    const geometry = feature.type === 'Feature' ? feature.geometry : feature
+
+    if (geometry.type === 'Polygon') {
+      for (let i = 1; i < geometry.coordinates.length; i++) {
+        polys.push({
+          type: 'Polygon',
+          coordinates: [geometry.coordinates[i]]
+        })
+      }
+    } else if (geometry.type === 'MultiPolygon') {
+      for (const childGeom of geometry.coordinates) {
+        for (let i = 1; i < childGeom.length; i++) {
+          polys.push({
+            type: 'Polygon',
+            coordinates: [childGeom[i]]
+          })
+        }
+      }
+    }
+
+    return polys
+  }
+
+    /**
+   * Given a GeoJSON polygon feature, locate and extract the interior rings
+   * A new geometry without interior rings will be returned. This will not alter the provided geometry.
+   * @param feature The feature to find interior rings in
+   */
+   public static async removeInteriorRings (feature: Feature | Polygon | MultiPolygon): Promise<Feature | Polygon | MultiPolygon> {
+    const clone = deepCopy(feature)
+    const geometry = clone.type === 'Feature' ? clone.geometry : feature
+
+    if (geometry.type === 'Polygon') {
+      geometry.coordinates = [geometry.coordinates[0]]
+    } else if (geometry.type === 'MultiPolygon') {
+      for (let i = 0; i < geometry.coordinates.length; i++) {
+        geometry.coordinates[i] = [geometry.coordinates[i][0]]
+      }
+    }
+
+    if (clone.type === 'Feature') {
+      clone.geometry = geometry as Geometry
+    }
+
+    return clone
   }
 }

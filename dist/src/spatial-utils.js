@@ -149,7 +149,7 @@ var SpatialUtils = /** @class */ (function () {
     };
     /**
      * Calculates the area of a polygon in metres squared.
-     * Mulitpolygon features will not have their areas separated.
+     * Multipolygon features will not have their areas separated.
      * @param polygon The polygon to calculate the area for
      */
     SpatialUtils.polygonArea = function (polygon) {
@@ -282,6 +282,90 @@ var SpatialUtils = /** @class */ (function () {
                 return [2 /*return*/, clone];
             });
         });
+    };
+    SpatialUtils.boundingBox = function (features) {
+        // if we didn't pass in an array, make it one anyway
+        // so we can process the same way below
+        if (!Array.isArray(features)) {
+            if (features.type === 'FeatureCollection') {
+                features = features.features;
+            }
+            else {
+                features = [features];
+            }
+        }
+        var minX = Infinity;
+        var maxX = -Infinity;
+        var minY = Infinity;
+        var maxY = -Infinity;
+        for (var _i = 0, features_1 = features; _i < features_1.length; _i++) {
+            var feature = features_1[_i];
+            var geometry 
+            // if we have a geometry collection, then get its bbox as a polygon
+            = void 0;
+            // if we have a geometry collection, then get its bbox as a polygon
+            if (feature.geometry.type === 'GeometryCollection') {
+                geometry = this.boundingBox(feature.geometry.geometries.map(function (geom) { return { type: 'Feature', geometry: geom, properties: {} }; }));
+            }
+            else {
+                geometry = feature.geometry;
+            }
+            switch (geometry.type) {
+                case 'Point': {
+                    minX = minX > geometry.coordinates[0] ? geometry.coordinates[0] : minX;
+                    maxX = maxX < geometry.coordinates[0] ? geometry.coordinates[0] : maxX;
+                    minY = minY > geometry.coordinates[1] ? geometry.coordinates[1] : minY;
+                    maxY = maxY < geometry.coordinates[1] ? geometry.coordinates[1] : maxY;
+                    break;
+                }
+                case 'LineString':
+                case 'MultiPoint': {
+                    for (var _a = 0, _b = geometry.coordinates; _a < _b.length; _a++) {
+                        var coord = _b[_a];
+                        minX = minX > coord[0] ? coord[0] : minX;
+                        maxX = maxX < coord[0] ? coord[0] : maxX;
+                        minY = minY > coord[1] ? coord[1] : minY;
+                        maxY = maxY < coord[1] ? coord[1] : maxY;
+                    }
+                    break;
+                }
+                case 'MultiLineString':
+                case 'Polygon': {
+                    for (var _c = 0, _d = geometry.coordinates; _c < _d.length; _c++) {
+                        var ring = _d[_c];
+                        for (var _e = 0, ring_2 = ring; _e < ring_2.length; _e++) {
+                            var coord = ring_2[_e];
+                            minX = minX > coord[0] ? coord[0] : minX;
+                            maxX = maxX < coord[0] ? coord[0] : maxX;
+                            minY = minY > coord[1] ? coord[1] : minY;
+                            maxY = maxY < coord[1] ? coord[1] : maxY;
+                        }
+                    }
+                    break;
+                }
+                case 'MultiPolygon': {
+                    for (var _f = 0, _g = geometry.coordinates; _f < _g.length; _f++) {
+                        var poly = _g[_f];
+                        for (var _h = 0, poly_2 = poly; _h < poly_2.length; _h++) {
+                            var ring = poly_2[_h];
+                            for (var _j = 0, ring_3 = ring; _j < ring_3.length; _j++) {
+                                var coord = ring_3[_j];
+                                minX = minX > coord[0] ? coord[0] : minX;
+                                maxX = maxX < coord[0] ? coord[0] : maxX;
+                                minY = minY > coord[1] ? coord[1] : minY;
+                                maxY = maxY < coord[1] ? coord[1] : maxY;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        return {
+            type: 'Polygon',
+            bbox: [minX, minY, maxX, maxY],
+            coordinates: [[[minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY], [minX, maxY]]]
+        };
     };
     SpatialUtils.RADIUS = 6378137;
     return SpatialUtils;

@@ -1,5 +1,5 @@
 import { deepCopy } from './deep-copy';
-import { Feature, Geometry, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
+import { Feature, FeatureCollection, Geometry, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
 
 export class SpatialUtils {
   public static readonly RADIUS = 6378137
@@ -155,7 +155,7 @@ export class SpatialUtils {
 
   /**
    * Calculates the area of a polygon in metres squared.
-   * Mulitpolygon features will not have their areas separated.
+   * Multipolygon features will not have their areas separated.
    * @param polygon The polygon to calculate the area for
    */
   public static polygonArea (polygon: Polygon | MultiPolygon): number {
@@ -291,5 +291,82 @@ export class SpatialUtils {
     }
 
     return clone
+  }
+
+  public static boundingBox (features: FeatureCollection | Feature | Feature[]): Polygon {
+    // if we didn't pass in an array, make it one anyway
+    // so we can process the same way below
+    if (!Array.isArray(features)) {
+      if (features.type === 'FeatureCollection') {
+        features = features.features
+      } else {
+        features = [features]
+      }
+    }
+
+    let minX = Infinity
+    let maxX = -Infinity
+    let minY = Infinity
+    let maxY = -Infinity
+    for (const feature of features) {
+      let geometry
+      // if we have a geometry collection, then get its bbox as a polygon
+      if (feature.geometry.type === 'GeometryCollection') {
+        geometry = this.boundingBox(feature.geometry.geometries.map(geom => { return { type: 'Feature', geometry: geom, properties: {} } }))
+      } else {
+        geometry = feature.geometry
+      }
+
+      switch (geometry.type) {
+        case 'Point': {
+          minX = minX > geometry.coordinates[0] ? geometry.coordinates[0] : minX
+          maxX = maxX < geometry.coordinates[0] ? geometry.coordinates[0] : maxX
+          minY = minY > geometry.coordinates[1] ? geometry.coordinates[1] : minY
+          maxY = maxY < geometry.coordinates[1] ? geometry.coordinates[1] : maxY
+          break
+        }
+        case 'LineString':
+        case 'MultiPoint': {
+          for (const coord of geometry.coordinates) {
+            minX = minX > coord[0] ? coord[0] : minX
+            maxX = maxX < coord[0] ? coord[0] : maxX
+            minY = minY > coord[1] ? coord[1] : minY
+            maxY = maxY < coord[1] ? coord[1] : maxY
+          }
+          break
+        }
+        case 'MultiLineString':
+        case 'Polygon': {
+          for (const ring of geometry.coordinates) {
+            for (const coord of ring) {
+              minX = minX > coord[0] ? coord[0] : minX
+              maxX = maxX < coord[0] ? coord[0] : maxX
+              minY = minY > coord[1] ? coord[1] : minY
+              maxY = maxY < coord[1] ? coord[1] : maxY
+            }
+          }
+          break
+        }
+        case 'MultiPolygon': {
+          for (const poly of geometry.coordinates) {
+            for (const ring of poly) {
+              for (const coord of ring) {
+                minX = minX > coord[0] ? coord[0] : minX
+                maxX = maxX < coord[0] ? coord[0] : maxX
+                minY = minY > coord[1] ? coord[1] : minY
+                maxY = maxY < coord[1] ? coord[1] : maxY
+              }
+            }
+          }
+          break
+        }
+      }
+    }
+
+    return {
+      type: 'Polygon',
+      bbox: [minX, minY, maxX, maxY],
+      coordinates: [[[minX, maxY], [maxX, maxY], [maxX, minY], [minX, minY], [minX, maxY]]]
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Feature, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
+import { Feature, FeatureCollection, LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
 export declare class SpatialUtils {
     static readonly RADIUS = 6378137;
     /**
@@ -55,7 +55,7 @@ export declare class SpatialUtils {
     static polygonPerimeter(polygon: Polygon | MultiPolygon): number;
     /**
      * Calculates the area of a polygon in metres squared.
-     * Mulitpolygon features will not have their areas separated.
+     * Multipolygon features will not have their areas separated.
      * @param polygon The polygon to calculate the area for
      */
     static polygonArea(polygon: Polygon | MultiPolygon): number;
@@ -94,4 +94,5 @@ export declare class SpatialUtils {
    * @param feature The feature to find interior rings in
    */
     static removeInteriorRings(feature: Feature | Polygon | MultiPolygon): Promise<Feature | Polygon | MultiPolygon>;
+    static boundingBox(features: FeatureCollection | Feature | Feature[]): Polygon;
 }

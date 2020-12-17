@@ -16,8 +16,8 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:2154').project()];
                 case 2:
                     json = _a.sent();
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0]).toBe(253531.13052374928);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1]).toBe(909838.9305578759);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0]).toEqual(253531.13052374928);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1]).toEqual(909838.9305578759);
                     return [2 /*return*/];
             }
         });
@@ -34,8 +34,8 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:3005').project()];
                 case 1:
                     json = _a.sent();
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0]).toBe(10901509.225202695);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1]).toBe(7730066.902148398);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0]).toEqual(10901509.225202695);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1]).toEqual(7730066.902148398);
                     return [2 /*return*/];
             }
         });
@@ -52,10 +52,10 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:3005').project()];
                 case 1:
                     json = _a.sent();
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][0]).toBe(10901509.225202695);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][1]).toBe(7730066.902148398);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1][0]).toBe(10786537.427251056);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1][1]).toBe(7850584.350612732);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][0]).toEqual(10901509.225202695);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][1]).toEqual(7730066.902148398);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1][0]).toEqual(10786537.427251056);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[1][1]).toEqual(7850584.350612732);
                     return [2 /*return*/];
             }
         });
@@ -72,12 +72,12 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:3005').project()];
                 case 1:
                     json = _a.sent();
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][0][0]).toBe(10901509.225202695);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][0][1]).toBe(7730066.902148398);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][1][0]).toBe(10786537.427251056);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][1][1]).toBe(7850584.350612732);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][2][0]).toBe(10669448.47213233);
-                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][2][1]).toBe(7968106.230009721);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][0][0]).toEqual(10901509.225202695);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][0][1]).toEqual(7730066.902148398);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][1][0]).toEqual(10786537.427251056);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][1][1]).toEqual(7850584.350612732);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][2][0]).toEqual(10669448.47213233);
+                    expect(json === null || json === void 0 ? void 0 : json.coordinates[0][2][1]).toEqual(7968106.230009721);
                     return [2 /*return*/];
             }
         });
@@ -98,8 +98,8 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:3005').project()];
                 case 1:
                     json = _a.sent();
-                    expect(json === null || json === void 0 ? void 0 : json.geometry.coordinates[0]).toBe(10901509.225202695);
-                    expect(json === null || json === void 0 ? void 0 : json.geometry.coordinates[1]).toBe(7730066.902148398);
+                    expect(json === null || json === void 0 ? void 0 : json.geometry.coordinates[0]).toEqual(10901509.225202695);
+                    expect(json === null || json === void 0 ? void 0 : json.geometry.coordinates[1]).toEqual(7730066.902148398);
                     return [2 /*return*/];
             }
         });
@@ -123,8 +123,8 @@ describe('Reprojector.ts', function () {
                         }).from('WGS84').to('EPSG:3005').project()];
                 case 1:
                     json = _a.sent();
-                    expect(json === null || json === void 0 ? void 0 : json.features[0].geometry.coordinates[0]).toBe(10901509.225202695);
-                    expect(json === null || json === void 0 ? void 0 : json.features[0].geometry.coordinates[1]).toBe(7730066.902148398);
+                    expect(json === null || json === void 0 ? void 0 : json.features[0].geometry.coordinates[0]).toEqual(10901509.225202695);
+                    expect(json === null || json === void 0 ? void 0 : json.features[0].geometry.coordinates[1]).toEqual(7730066.902148398);
                     return [2 /*return*/];
             }
         });

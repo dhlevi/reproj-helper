@@ -198,18 +198,12 @@ export class ReProjector {
         this.projectPoint(geometry.coordinates)
         break
       }
-      case 'LineString': { 
-        this.projectLineString(geometry.coordinates)
-        break
-      }
+      case 'LineString':
       case 'MultiPoint': { 
         this.projectLineString(geometry.coordinates)
         break
       }
-      case 'Polygon': { 
-        this.projectPolygon(geometry.coordinates)
-        break
-      }
+      case 'Polygon':
       case 'MultiLineString': { 
         this.projectPolygon(geometry.coordinates)
         break

@@ -2,6 +2,12 @@
 
 A simple helper utility for re-projecting geojson data with Proj4. Includes type definitions for typescript.
 
+Add it to your project with:
+
+```bash
+npm i reproj-helper
+```
+
 ## What it does
 
 This utility acts as a simple wrapper around the Proj4 library, allowing you to pass in valid GeoJSON `FeatureCollection`, `Feature`, `GeometryCollection`, and individual `Geometry` types. All underlying coordinates will be projected to the supplied projection via Proj4.
@@ -75,6 +81,7 @@ These include:
 - Polygon Area (in meters squared)
 - Coordinate precision reducer
 - Find and/or Remove interior rings from a polygon
+- Bounding Box of Features, FeatureCollections
 - Basic converter for WKT (See the FormatConverter class)
 
 ## Format Converter

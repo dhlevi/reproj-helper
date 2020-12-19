@@ -238,6 +238,18 @@ var SpatialUtils = /** @class */ (function () {
     SpatialUtils.reduceCoordinatePrecision = function (coords, reduceTo) {
         return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)];
     };
+    SpatialUtils.compareCoordinates = function (a, b) {
+        if (a[0] < b[0])
+            return -1;
+        else if (a[0] > b[0])
+            return 1;
+        else if (a[1] < b[1])
+            return -1;
+        else if (a[1] > b[1])
+            return 1;
+        else
+            return 0;
+    };
     SpatialUtils.RADIUS = 6378137;
     return SpatialUtils;
 }());

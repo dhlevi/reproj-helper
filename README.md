@@ -116,6 +116,8 @@ There's an addition to the spatial utils class called `SpatialTransformers`. Thi
 - Bounding Box of Features and FeatureCollections
 - Create a centroid for a feature
 - Reduce precision for a feature
+- Explode features (extract all vertices)
+- Convex Hull creator
 
 ### Transformers Usage
 

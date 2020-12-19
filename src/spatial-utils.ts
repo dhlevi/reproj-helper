@@ -254,4 +254,12 @@ export class SpatialUtils {
   public static reduceCoordinatePrecision (coords: Position, reduceTo: number): Position {
     return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)]
   }
+
+  public static compareCoordinates (a: Position, b: Position): number {
+		if (a[0] < b[0]) return -1
+		else if (a[0] > b[0]) return 1
+		else if (a[1] < b[1]) return -1
+		else if (a[1] > b[1]) return 1
+		else return 0
+  }
 }

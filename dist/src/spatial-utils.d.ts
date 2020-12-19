@@ -99,4 +99,5 @@ export declare class SpatialUtils {
      * @returns A precision-reduced Position
      */
     static reduceCoordinatePrecision(coords: Position, reduceTo: number): Position;
+    static compareCoordinates(a: Position, b: Position): number;
 }

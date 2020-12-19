@@ -51,7 +51,6 @@ describe('spatial-utils.ts', function () {
         var sourceWkt = 'POINT (62.8978347, -122.64298374)';
         var json = converter.fromWkt(sourceWkt).toGeoJson();
         var precisionReduced = SpatialTransformers.reducePrecision(json, 3);
-        console.log(JSON.stringify(precisionReduced));
         expect(precisionReduced.geometry.coordinates).toEqual([62.898, -122.643]);
     });
     it('Test Centroid', function () {
@@ -61,6 +60,23 @@ describe('spatial-utils.ts', function () {
         var centroid = SpatialTransformers.featureCentroid(json);
         var reducedPrecisionCentroid = SpatialTransformers.reducePrecision(centroid, 3);
         expect(reducedPrecisionCentroid.coordinates).toEqual([27.222, 26.667]);
+    });
+    it('Test exploder', function () {
+        var converter = new FormatConverter();
+        var sourceWkt = 'POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))';
+        var json = converter.fromWkt(sourceWkt).toGeoJson();
+        var vertices = SpatialTransformers.explodeVertices(json);
+        expect(vertices.length).toEqual(9);
+    });
+    it('Test Convex Hull', function () {
+        var converter = new FormatConverter();
+        var sourceWkt = 'POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))';
+        var json = converter.fromWkt(sourceWkt).toGeoJson();
+        var hull = SpatialTransformers.convexHull(json);
+        // get a better test here. This example is pretty much a donut remover...
+        expect(hull.coordinates[0].length).toEqual(4);
+        expect(hull.coordinates[0][0]).toEqual([10, 20]);
+        expect(hull.coordinates[0][1]).toEqual([15, 40]);
     });
 });
 //# sourceMappingURL=transformer.test.js.map

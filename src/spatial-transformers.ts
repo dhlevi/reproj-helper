@@ -275,4 +275,144 @@ export class SpatialTransformers {
 
     return feature.type !== 'Feature' ? clone.geometry : clone
   }
+
+  /**
+   * Returns all of the vertices contiained in the supplied feature
+   * @param feature The feature to explode
+   * @returns an array of coordinates
+   */
+  public static explodeVertices (feature: Feature | Geometry): Position[] {
+    let clone = deepCopy(feature)
+
+    if (clone.type !== 'Feature') {
+      clone = {
+        type: 'Feature',
+        geometry: clone,
+        properties: null
+      }
+    }
+
+    const coords: Position[] = []
+
+    switch (clone.geometry.type) {
+      case 'Point': {
+        coords.push(clone.geometry.coordinates)
+        break
+      }
+      case 'LineString':
+      case 'MultiPoint': {
+        coords.push(...clone.geometry.coordinates)
+        break
+      }
+      case 'MultiLineString':
+      case 'Polygon': {
+        for (const ring of clone.geometry.coordinates) {
+          coords.push(...ring)
+        }
+        break
+      }
+      case 'MultiPolygon': {
+        for (const poly of clone.geometry.coordinates) {
+          for (const ring of poly) {
+            coords.push(...ring)
+          }
+        }
+        break
+      }
+      case 'GeometryCollection': {
+        for (let i = 0; i < clone.geometry.geometries.length; i++) {
+          coords.push(...this.explodeVertices(clone.geometry.geometries[i]))
+        }
+      }
+    }
+
+    return coords
+  }
+
+  public static convexHull (features: Feature | Feature[] | Geometry | Geometry[] | FeatureCollection | Position[]): Polygon {
+    const vertices: Position[] = []
+
+    if (!Array.isArray(features) && features.type === 'FeatureCollection') {
+      for (const feature of features.features) {
+        vertices.push(...this.explodeVertices(feature))
+      }
+    } else if (!Array.isArray(features)) {
+      vertices.push(...this.explodeVertices(features))
+    } else {
+      // In this case, we have an array of Features, Geometries, or Positions
+      // But these are interfaces, so no instanceof check. We can loop through
+      // the items, and just determine what we have based on property.
+      // If we have a geometry attribute, its a feature, coordinates mean its a geometry
+      // and finally, it must be a position (number[])
+      for (const item of features) {
+        if (Object.prototype.hasOwnProperty.call(item, 'coordinates') || Object.prototype.hasOwnProperty.call(item, 'geometry')) {
+          vertices.push(...this.explodeVertices(item as Feature | Geometry))
+        } else {
+          vertices.push(item as Position)
+        }
+      }
+    }
+
+    if (vertices.length <= 1) {
+      return {
+        type: 'Polygon',
+        coordinates: []
+      }
+    }
+
+    // Now we have a collection of vertices. Sort
+    vertices.sort(SpatialUtils.compareCoordinates)
+    
+    // and return the hull as a polygon
+		
+		// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
+    const upperHull: Position[] = []
+    
+		for (let i = 0; i < vertices.length; i++) {
+      const vertex = vertices[i]
+      
+			while (upperHull.length >= 2) {
+        if ((upperHull[upperHull.length - 1][0] - upperHull[upperHull.length - 2][0]) * (vertex[1] - upperHull[upperHull.length - 2][1]) >= 
+            (upperHull[upperHull.length - 1][1] - upperHull[upperHull.length - 2][1]) * (vertex[0] - upperHull[upperHull.length - 2][0])) {
+          upperHull.pop()
+        } else {
+          break
+        }
+      }
+
+			upperHull.push(vertex)
+    }
+
+		upperHull.pop()
+
+		const lowerHull: Position[] = []
+		for (let i = vertices.length - 1; i >= 0; i--) {
+      const vertex = vertices[i]
+
+			while (lowerHull.length >= 2) {
+        if ((lowerHull[lowerHull.length - 1][0] - lowerHull[lowerHull.length - 2][0]) * (vertex[1] - lowerHull[lowerHull.length - 2][1]) >= 
+            (lowerHull[lowerHull.length - 1][1] - lowerHull[lowerHull.length - 2][1]) * (vertex[0] - lowerHull[lowerHull.length - 2][0])) {
+          lowerHull.pop()
+        } else {
+          break
+        }
+      }
+
+			lowerHull.push(vertex)
+    }
+
+		lowerHull.pop()
+		
+		if (upperHull.length == 1 && lowerHull.length == 1 && upperHull[0][0] == lowerHull[0][0] && upperHull[0][1] == lowerHull[0][1]) {
+      return {
+        type: 'Polygon',
+        coordinates: [upperHull]
+      }
+    } else {
+      return {
+        type: 'Polygon',
+        coordinates: [upperHull.concat(lowerHull)]
+      }
+    }
+  }
 }

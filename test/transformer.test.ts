@@ -52,8 +52,6 @@ describe('spatial-utils.ts', () => {
     const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
     const precisionReduced = SpatialTransformers.reducePrecision(json, 3) as Feature
 
-    console.log(JSON.stringify(precisionReduced))
-    
     expect((precisionReduced.geometry as Point).coordinates).toEqual([62.898, -122.643])
   })
   it('Test Centroid', () => {
@@ -64,5 +62,24 @@ describe('spatial-utils.ts', () => {
     const reducedPrecisionCentroid = SpatialTransformers.reducePrecision(centroid, 3) as Point
 
     expect(reducedPrecisionCentroid.coordinates).toEqual([27.222, 26.667])
+  })
+  it('Test exploder', () => {
+    const converter = new FormatConverter()
+    const sourceWkt = 'POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))'
+    const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
+    const vertices = SpatialTransformers.explodeVertices(json)
+
+    expect(vertices.length).toEqual(9)
+  })
+  it('Test Convex Hull', () => {
+    const converter = new FormatConverter()
+    const sourceWkt = 'POLYGON ((35 10, 45 45, 15 40, 10 20, 35 10), (20 30, 35 35, 30 20, 20 30))'
+    const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
+    const hull = SpatialTransformers.convexHull(json)
+
+    // get a better test here. This example is pretty much a donut remover...
+    expect(hull.coordinates[0].length).toEqual(4)
+    expect(hull.coordinates[0][0]).toEqual([10, 20])
+    expect(hull.coordinates[0][1]).toEqual([15, 40])
   })
 })

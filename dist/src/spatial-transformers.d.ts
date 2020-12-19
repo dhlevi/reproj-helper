@@ -1,4 +1,4 @@
-import { Feature, FeatureCollection, Geometry, MultiPolygon, Point, Polygon } from "geojson";
+import { Feature, FeatureCollection, Geometry, MultiPolygon, Point, Polygon, Position } from "geojson";
 /**
  * A Spatial Transformation helper that takes an input geometry or collection
  * of geometries, and transforms the data into something else. The functions
@@ -38,4 +38,11 @@ export declare class SpatialTransformers {
      * @returns a cloned copy of the feature with precision reduced
      */
     static reducePrecision(feature: Feature | Geometry, reduceTo: number): Feature | Geometry;
+    /**
+     * Returns all of the vertices contiained in the supplied feature
+     * @param feature The feature to explode
+     * @returns an array of coordinates
+     */
+    static explodeVertices(feature: Feature | Geometry): Position[];
+    static convexHull(features: Feature | Feature[] | Geometry | Geometry[] | FeatureCollection | Position[]): Polygon;
 }

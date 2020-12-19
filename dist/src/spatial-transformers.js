@@ -292,6 +292,137 @@ var SpatialTransformers = /** @class */ (function () {
         }
         return feature.type !== 'Feature' ? clone.geometry : clone;
     };
+    /**
+     * Returns all of the vertices contiained in the supplied feature
+     * @param feature The feature to explode
+     * @returns an array of coordinates
+     */
+    SpatialTransformers.explodeVertices = function (feature) {
+        var clone = deepCopy(feature);
+        if (clone.type !== 'Feature') {
+            clone = {
+                type: 'Feature',
+                geometry: clone,
+                properties: null
+            };
+        }
+        var coords = [];
+        switch (clone.geometry.type) {
+            case 'Point': {
+                coords.push(clone.geometry.coordinates);
+                break;
+            }
+            case 'LineString':
+            case 'MultiPoint': {
+                coords.push.apply(coords, clone.geometry.coordinates);
+                break;
+            }
+            case 'MultiLineString':
+            case 'Polygon': {
+                for (var _i = 0, _a = clone.geometry.coordinates; _i < _a.length; _i++) {
+                    var ring = _a[_i];
+                    coords.push.apply(coords, ring);
+                }
+                break;
+            }
+            case 'MultiPolygon': {
+                for (var _b = 0, _c = clone.geometry.coordinates; _b < _c.length; _b++) {
+                    var poly = _c[_b];
+                    for (var _d = 0, poly_4 = poly; _d < poly_4.length; _d++) {
+                        var ring = poly_4[_d];
+                        coords.push.apply(coords, ring);
+                    }
+                }
+                break;
+            }
+            case 'GeometryCollection': {
+                for (var i = 0; i < clone.geometry.geometries.length; i++) {
+                    coords.push.apply(coords, this.explodeVertices(clone.geometry.geometries[i]));
+                }
+            }
+        }
+        return coords;
+    };
+    SpatialTransformers.convexHull = function (features) {
+        var vertices = [];
+        if (!Array.isArray(features) && features.type === 'FeatureCollection') {
+            for (var _i = 0, _a = features.features; _i < _a.length; _i++) {
+                var feature = _a[_i];
+                vertices.push.apply(vertices, this.explodeVertices(feature));
+            }
+        }
+        else if (!Array.isArray(features)) {
+            vertices.push.apply(vertices, this.explodeVertices(features));
+        }
+        else {
+            // In this case, we have an array of Features, Geometries, or Positions
+            // But these are interfaces, so no instanceof check. We can loop through
+            // the items, and just determine what we have based on property.
+            // If we have a geometry attribute, its a feature, coordinates mean its a geometry
+            // and finally, it must be a position (number[])
+            for (var _b = 0, features_2 = features; _b < features_2.length; _b++) {
+                var item = features_2[_b];
+                if (Object.prototype.hasOwnProperty.call(item, 'coordinates') || Object.prototype.hasOwnProperty.call(item, 'geometry')) {
+                    vertices.push.apply(vertices, this.explodeVertices(item));
+                }
+                else {
+                    vertices.push(item);
+                }
+            }
+        }
+        if (vertices.length <= 1) {
+            return {
+                type: 'Polygon',
+                coordinates: []
+            };
+        }
+        // Now we have a collection of vertices. Sort
+        vertices.sort(SpatialUtils.compareCoordinates);
+        // and return the hull as a polygon
+        // https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
+        var upperHull = [];
+        for (var i = 0; i < vertices.length; i++) {
+            var vertex = vertices[i];
+            while (upperHull.length >= 2) {
+                if ((upperHull[upperHull.length - 1][0] - upperHull[upperHull.length - 2][0]) * (vertex[1] - upperHull[upperHull.length - 2][1]) >=
+                    (upperHull[upperHull.length - 1][1] - upperHull[upperHull.length - 2][1]) * (vertex[0] - upperHull[upperHull.length - 2][0])) {
+                    upperHull.pop();
+                }
+                else {
+                    break;
+                }
+            }
+            upperHull.push(vertex);
+        }
+        upperHull.pop();
+        var lowerHull = [];
+        for (var i = vertices.length - 1; i >= 0; i--) {
+            var vertex = vertices[i];
+            while (lowerHull.length >= 2) {
+                if ((lowerHull[lowerHull.length - 1][0] - lowerHull[lowerHull.length - 2][0]) * (vertex[1] - lowerHull[lowerHull.length - 2][1]) >=
+                    (lowerHull[lowerHull.length - 1][1] - lowerHull[lowerHull.length - 2][1]) * (vertex[0] - lowerHull[lowerHull.length - 2][0])) {
+                    lowerHull.pop();
+                }
+                else {
+                    break;
+                }
+            }
+            lowerHull.push(vertex);
+        }
+        lowerHull.pop();
+        if (upperHull.length == 1 && lowerHull.length == 1 && upperHull[0][0] == lowerHull[0][0] && upperHull[0][1] == lowerHull[0][1]) {
+            return {
+                type: 'Polygon',
+                coordinates: [upperHull]
+            };
+        }
+        else {
+            return {
+                type: 'Polygon',
+                coordinates: [upperHull.concat(lowerHull)]
+            };
+        }
+    };
     SpatialTransformers.RADIUS = 6378137;
     return SpatialTransformers;
 }());

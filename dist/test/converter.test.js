@@ -18,7 +18,7 @@ describe('format-converter.ts', function () {
         });
     }); });
     it('Test wkt point conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var converter, sourceWkt, json, wktString;
+        var converter, sourceWkt, json, wktString, sourceMWkt, mjson, mwktString;
         return __generator(this, function (_a) {
             converter = new FormatConverter();
             sourceWkt = 'POINT (0 0)';
@@ -29,6 +29,16 @@ describe('format-converter.ts', function () {
             expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1]).toBe(0);
             wktString = converter.fromGeoJson(json).toWkt();
             expect(wktString).toBe(sourceWkt);
+            sourceMWkt = 'POINT M (10 10 20)';
+            mjson = converter.fromWkt(sourceMWkt).toGeoJson();
+            console.log(mjson);
+            expect(mjson === null || mjson === void 0 ? void 0 : mjson.type).toBe('Feature');
+            expect(mjson === null || mjson === void 0 ? void 0 : mjson.geometry.type).toBe('Point');
+            expect((mjson === null || mjson === void 0 ? void 0 : mjson.geometry).coordinates[0]).toBe(10);
+            expect((mjson === null || mjson === void 0 ? void 0 : mjson.geometry).coordinates[1]).toBe(10);
+            expect((mjson === null || mjson === void 0 ? void 0 : mjson.geometry).coordinates[2]).toBe(20);
+            mwktString = converter.fromGeoJson(mjson).toWkt();
+            expect(mwktString).toBe(sourceMWkt);
             return [2 /*return*/];
         });
     }); });

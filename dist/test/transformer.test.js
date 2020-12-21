@@ -1,7 +1,7 @@
 import { __awaiter, __generator } from "tslib";
 import { FormatConverter } from "../src/format-converter";
 import { SpatialTransformers } from "../src/spatial-transformers";
-describe('spatial-utils.ts', function () {
+describe('transformer.ts', function () {
     it('Test interior ring find/remove', function () { return __awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, ring, ringWkt, cleanJson, cleanWkt, multipolyWkt, multiPolyJson, mpRing, mpRingWkt;
         return __generator(this, function (_a) {

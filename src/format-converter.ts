@@ -71,7 +71,7 @@ export class FormatConverter {
 
     const type = this.sourceWkt.split(' ')[0].trim().toUpperCase()
     const typeMod = this.sourceWkt.split(' ')[1].trim().toUpperCase()
-    const unsupported = ['EMPTY', 'ZM', 'M'].includes(typeMod)
+    const unsupported = ['EMPTY'].includes(typeMod)
 
     if (unsupported) {
       throw Error('Geometry is empty or using an unupported type!')
@@ -179,7 +179,14 @@ export class FormatConverter {
 
   // Parsing for WKT to json
   private parseWktCoord (coord: string): number[] {
-    return [parseFloat(coord.trim().split(' ')[0]), parseFloat(coord.trim().split(' ')[1])]
+    const coordValues = coord.trim().split(' ')
+    const jsonCoord = []
+
+    for(const val of coordValues) {
+      jsonCoord.push(parseFloat(val))
+    }
+
+    return jsonCoord
   }
 
   // Parsing a Line WKT to json
@@ -232,7 +239,7 @@ export class FormatConverter {
   private wktStringFromGeometry (geometry: Geometry): string {
     switch (geometry.type) {
       case 'Point': {
-        return `POINT (${this.toWktCoordString(geometry.coordinates)})`
+        return `POINT${geometry.coordinates.length === 2 ? ' ' : geometry.coordinates.length === 3 ? ' M ' : ' ZM ' }(${this.toWktCoordString(geometry.coordinates)})`
       }
       case 'MultiPoint': {
         return `MULTIPOINT (${this.lineToWktString(geometry.coordinates)})`
@@ -290,6 +297,12 @@ export class FormatConverter {
   }
 
   private toWktCoordString(coordinate: Position): string {
-    return `${coordinate[0]} ${coordinate[1]}`
+    let coordString = ''
+
+    for(const coord of coordinate) {
+      coordString += `${coord} `
+    }
+
+    return coordString.trim()
   }
 }

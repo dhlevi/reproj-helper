@@ -28,6 +28,19 @@ describe('format-converter.ts', () => {
 
     const wktString = converter.fromGeoJson(json).toWkt()
     expect(wktString).toBe(sourceWkt)
+
+    const sourceMWkt = 'POINT M (10 10 20)'
+    const mjson = converter.fromWkt(sourceMWkt).toGeoJson() as Feature
+
+    expect(mjson?.type).toBe('Feature')
+    expect(mjson?.geometry.type).toBe('Point')
+    expect((mjson?.geometry as Point).coordinates[0]).toBe(10)
+    expect((mjson?.geometry as Point).coordinates[1]).toBe(10)
+    expect((mjson?.geometry as Point).coordinates[2]).toBe(20)
+
+    const mwktString = converter.fromGeoJson(mjson).toWkt()
+    expect(mwktString).toBe(sourceMWkt)
+
   })
   it('Test wkt MultiPoint conversion', async () => {
     const converter = new FormatConverter()

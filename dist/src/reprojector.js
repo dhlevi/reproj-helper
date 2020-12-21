@@ -238,8 +238,9 @@ var ReProjector = /** @class */ (function () {
     };
     ReProjector.prototype.projectPoint = function (coords) {
         var projectedCoords = proj4(this.fromProjection, this.toProjection, coords);
-        coords[0] = projectedCoords[0];
-        coords[1] = projectedCoords[1];
+        for (var i = 0; i < projectedCoords.length; i++) {
+            coords[i] = projectedCoords[i];
+        }
     };
     return ReProjector;
 }());

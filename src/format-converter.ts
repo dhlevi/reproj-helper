@@ -40,8 +40,8 @@ export class FormatConverter {
   /**
    * Converts to Well Known Text
    */
-  public toWkt (): string {
-    return this.convertToWkt()
+  public toWkt (zCoordConversion = false): string {
+    return this.convertToWkt(zCoordConversion)
   }
 
   /**
@@ -111,12 +111,14 @@ export class FormatConverter {
             coordinates: this.parseWktRing(data) // Multi Linestring is identical to Polygon
           }
         }
+        case 'TRIANGLE':
         case 'POLYGON': {
           return {
             type: 'Polygon',
             coordinates: this.parseWktRing(data)
           }
         }
+        case 'TIN':
         case 'MULTIPOLYGON': {
           const multiPolyGeom: Geometry = {
             type: 'MultiPolygon',
@@ -218,25 +220,25 @@ export class FormatConverter {
    * Json to WKT
    *****************/
 
-  private convertToWkt (): string {
+  private convertToWkt (zCoordConversion = false): string {
     if (this.sourceJson) {
       if (this.sourceJson.type === 'FeatureCollection') {
         let wktString = 'GEOMETRYCOLLECTION ('
         for (const childFeature of this.sourceJson.features) {
-          wktString += `${this.wktStringFromGeometry(childFeature.geometry)}, `
+          wktString += `${this.wktStringFromGeometry(childFeature.geometry, zCoordConversion)}, `
         }
         return wktString.substring(0, wktString.length - 2) + ')'
       } else if (this.sourceJson.type === 'Feature') {
-        return this.wktStringFromGeometry(this.sourceJson.geometry)
+        return this.wktStringFromGeometry(this.sourceJson.geometry, zCoordConversion)
       } else {
-        return this.wktStringFromGeometry(this.sourceJson)
+        return this.wktStringFromGeometry(this.sourceJson, zCoordConversion)
       }
     }
 
     return ''
   }
 
-  private wktStringFromGeometry (geometry: Geometry): string {
+  private wktStringFromGeometry (geometry: Geometry, zCoordConversion = false): string {
     switch (geometry.type) {
       case 'Point': {
         return `POINT${geometry.coordinates.length === 2 ? ' ' : geometry.coordinates.length === 3 ? ' M ' : ' ZM ' }(${this.toWktCoordString(geometry.coordinates)})`
@@ -251,10 +253,10 @@ export class FormatConverter {
         return `MULTILINESTRING (${this.ringToWktString(geometry.coordinates)})`
       }
       case 'Polygon': {
-        return `POLYGON (${this.ringToWktString(geometry.coordinates)})`
+        return `${geometry.coordinates[0][0].length === 3 && zCoordConversion ? 'TRIANGLE' : 'POLYGON'} (${this.ringToWktString(geometry.coordinates)})`
       }
       case 'MultiPolygon': {
-        return `MULTIPOLYGON (${this.polygonToWktString(geometry.coordinates)})`
+        return `${geometry.coordinates[0][0][0].length === 3 && zCoordConversion ? 'TIN' : 'MULTIPOLYGON'} (${this.polygonToWktString(geometry.coordinates)})`
       }
       case 'GeometryCollection': {
         let wktString = 'GEOMETRYCOLLECTION ('

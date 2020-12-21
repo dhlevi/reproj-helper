@@ -85,7 +85,11 @@ These include:
 
 ## Format Converter
 
-There's a simple format converter for converting WKT to GeoJSON, or vice versa. Currently it does not support `POINT ZM`, `POINT M`, `TRIANGLE`, `TIN`, or `POLYHEDRALSURFACE Z` but support for those will be on the way eventually. Converting other formats is also planned for a future update.
+There's a simple format converter for converting WKT to GeoJSON, or vice versa. Currently it does not support `POLYHEDRALSURFACE Z`.
+
+Note that `TRIANGLE` will convert to a GeoJSON `Polygon`, and `TIN` will convert to a GeoJSON `MultiPolygon`. When converting these back to WKT, you may have to manually set the type from `POLYGON` or `MULTIPOLYGON` back to `TRIANGLE` and `TIN` respectively, or, when calling the `.toWkt()` function, pass in a value of `true`: `.toWkt(true)` to tell the converter to use `zCoordConversion`. This will convert POLYGONS to TRIANGLES if the value is true, and the polygon has a z coordinate.
+
+Converting other formats is also planned for a future update.
 
 ### Converter Usage
 

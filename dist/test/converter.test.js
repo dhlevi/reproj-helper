@@ -31,7 +31,6 @@ describe('format-converter.ts', function () {
             expect(wktString).toBe(sourceWkt);
             sourceMWkt = 'POINT M (10 10 20)';
             mjson = converter.fromWkt(sourceMWkt).toGeoJson();
-            console.log(mjson);
             expect(mjson === null || mjson === void 0 ? void 0 : mjson.type).toBe('Feature');
             expect(mjson === null || mjson === void 0 ? void 0 : mjson.geometry.type).toBe('Point');
             expect((mjson === null || mjson === void 0 ? void 0 : mjson.geometry).coordinates[0]).toBe(10);
@@ -188,6 +187,52 @@ describe('format-converter.ts', function () {
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
             expect(json === null || json === void 0 ? void 0 : json.geometry.type).toBe('GeometryCollection');
             wktString = converter.fromGeoJson(json).toWkt();
+            expect(wktString).toBe(sourceWkt);
+            return [2 /*return*/];
+        });
+    }); });
+    it('Test wkt triangle to polygon conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var converter, sourceWkt, json, wktString;
+        return __generator(this, function (_a) {
+            converter = new FormatConverter();
+            sourceWkt = 'TRIANGLE ((0 0 0, 0 1 0, 1 1 0, 0 0 0))';
+            json = converter.fromWkt(sourceWkt).toGeoJson();
+            expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
+            expect(json === null || json === void 0 ? void 0 : json.geometry.type).toBe('Polygon');
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][1]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][1][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][1][1]).toBe(1);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][2][0]).toBe(1);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][2][1]).toBe(1);
+            wktString = converter.fromGeoJson(json).toWkt(true);
+            expect(wktString).toBe(sourceWkt);
+            return [2 /*return*/];
+        });
+    }); });
+    it('Test wkt TIN to multipolygon conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var converter, sourceWkt, json, wktString;
+        return __generator(this, function (_a) {
+            converter = new FormatConverter();
+            sourceWkt = 'TIN (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 1 0, 0 0 0)))';
+            json = converter.fromWkt(sourceWkt).toGeoJson();
+            expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
+            expect(json === null || json === void 0 ? void 0 : json.geometry.type).toBe('MultiPolygon');
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][0][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][0][1]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][0][2]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][1][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][1][1]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][1][2]).toBe(1);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][2][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[0][0][2][1]).toBe(1);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1][0][0][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1][0][0][1]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1][0][1][0]).toBe(0);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1][0][1][1]).toBe(1);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1][0][2][0]).toBe(1);
+            expect((json === null || json === void 0 ? void 0 : json.geometry).coordinates[1][0][2][1]).toBe(1);
+            wktString = converter.fromGeoJson(json).toWkt(true);
             expect(wktString).toBe(sourceWkt);
             return [2 /*return*/];
         });

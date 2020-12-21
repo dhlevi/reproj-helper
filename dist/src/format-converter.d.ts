@@ -23,7 +23,7 @@ export declare class FormatConverter {
     /**
      * Converts to Well Known Text
      */
-    toWkt(): string;
+    toWkt(zCoordConversion?: boolean): string;
     /**
      * Convert a geojson feature
      * @param json GeoJSON feature

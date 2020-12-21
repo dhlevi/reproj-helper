@@ -35,8 +35,9 @@ var FormatConverter = /** @class */ (function () {
     /**
      * Converts to Well Known Text
      */
-    FormatConverter.prototype.toWkt = function () {
-        return this.convertToWkt();
+    FormatConverter.prototype.toWkt = function (zCoordConversion) {
+        if (zCoordConversion === void 0) { zCoordConversion = false; }
+        return this.convertToWkt(zCoordConversion);
     };
     /**
      * Convert a geojson feature
@@ -97,12 +98,14 @@ var FormatConverter = /** @class */ (function () {
                         coordinates: this.parseWktRing(data) // Multi Linestring is identical to Polygon
                     };
                 }
+                case 'TRIANGLE':
                 case 'POLYGON': {
                     return {
                         type: 'Polygon',
                         coordinates: this.parseWktRing(data)
                     };
                 }
+                case 'TIN':
                 case 'MULTIPOLYGON': {
                     var multiPolyGeom = {
                         type: 'MultiPolygon',
@@ -193,26 +196,28 @@ var FormatConverter = /** @class */ (function () {
     /*****************
      * Json to WKT
      *****************/
-    FormatConverter.prototype.convertToWkt = function () {
+    FormatConverter.prototype.convertToWkt = function (zCoordConversion) {
+        if (zCoordConversion === void 0) { zCoordConversion = false; }
         if (this.sourceJson) {
             if (this.sourceJson.type === 'FeatureCollection') {
                 var wktString = 'GEOMETRYCOLLECTION (';
                 for (var _i = 0, _a = this.sourceJson.features; _i < _a.length; _i++) {
                     var childFeature = _a[_i];
-                    wktString += this.wktStringFromGeometry(childFeature.geometry) + ", ";
+                    wktString += this.wktStringFromGeometry(childFeature.geometry, zCoordConversion) + ", ";
                 }
                 return wktString.substring(0, wktString.length - 2) + ')';
             }
             else if (this.sourceJson.type === 'Feature') {
-                return this.wktStringFromGeometry(this.sourceJson.geometry);
+                return this.wktStringFromGeometry(this.sourceJson.geometry, zCoordConversion);
             }
             else {
-                return this.wktStringFromGeometry(this.sourceJson);
+                return this.wktStringFromGeometry(this.sourceJson, zCoordConversion);
             }
         }
         return '';
     };
-    FormatConverter.prototype.wktStringFromGeometry = function (geometry) {
+    FormatConverter.prototype.wktStringFromGeometry = function (geometry, zCoordConversion) {
+        if (zCoordConversion === void 0) { zCoordConversion = false; }
         switch (geometry.type) {
             case 'Point': {
                 return "POINT" + (geometry.coordinates.length === 2 ? ' ' : geometry.coordinates.length === 3 ? ' M ' : ' ZM ') + "(" + this.toWktCoordString(geometry.coordinates) + ")";
@@ -227,10 +232,10 @@ var FormatConverter = /** @class */ (function () {
                 return "MULTILINESTRING (" + this.ringToWktString(geometry.coordinates) + ")";
             }
             case 'Polygon': {
-                return "POLYGON (" + this.ringToWktString(geometry.coordinates) + ")";
+                return (geometry.coordinates[0][0].length === 3 && zCoordConversion ? 'TRIANGLE' : 'POLYGON') + " (" + this.ringToWktString(geometry.coordinates) + ")";
             }
             case 'MultiPolygon': {
-                return "MULTIPOLYGON (" + this.polygonToWktString(geometry.coordinates) + ")";
+                return (geometry.coordinates[0][0][0].length === 3 && zCoordConversion ? 'TIN' : 'MULTIPOLYGON') + " (" + this.polygonToWktString(geometry.coordinates) + ")";
             }
             case 'GeometryCollection': {
                 var wktString = 'GEOMETRYCOLLECTION (';

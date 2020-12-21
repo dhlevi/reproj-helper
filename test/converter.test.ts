@@ -194,4 +194,48 @@ describe('format-converter.ts', () => {
     const wktString = converter.fromGeoJson(json).toWkt()
     expect(wktString).toBe(sourceWkt)
   })
+  it('Test wkt triangle to polygon conversion', async () => {
+    const converter = new FormatConverter()
+
+    const sourceWkt = 'TRIANGLE ((0 0 0, 0 1 0, 1 1 0, 0 0 0))'
+    const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
+
+    expect(json?.type).toBe('Feature')
+    expect(json?.geometry.type).toBe('Polygon')
+    expect((json?.geometry as Polygon).coordinates[0][0][0]).toBe(0)
+    expect((json?.geometry as Polygon).coordinates[0][0][1]).toBe(0)
+    expect((json?.geometry as Polygon).coordinates[0][1][0]).toBe(0)
+    expect((json?.geometry as Polygon).coordinates[0][1][1]).toBe(1)
+    expect((json?.geometry as Polygon).coordinates[0][2][0]).toBe(1)
+    expect((json?.geometry as Polygon).coordinates[0][2][1]).toBe(1)
+
+    const wktString = converter.fromGeoJson(json).toWkt(true)
+    expect(wktString).toBe(sourceWkt)
+  })
+  it('Test wkt TIN to multipolygon conversion', async () => {
+    const converter = new FormatConverter()
+
+    const sourceWkt = 'TIN (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 1 0, 0 0 0)))'
+    const json = converter.fromWkt(sourceWkt).toGeoJson() as Feature
+
+    expect(json?.type).toBe('Feature')
+    expect(json?.geometry.type).toBe('MultiPolygon')
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][0][0]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][0][1]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][0][2]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][1][0]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][1][1]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][1][2]).toBe(1)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][2][0]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[0][0][2][1]).toBe(1)
+    expect((json?.geometry as MultiPolygon).coordinates[1][0][0][0]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[1][0][0][1]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[1][0][1][0]).toBe(0)
+    expect((json?.geometry as MultiPolygon).coordinates[1][0][1][1]).toBe(1)
+    expect((json?.geometry as MultiPolygon).coordinates[1][0][2][0]).toBe(1)
+    expect((json?.geometry as MultiPolygon).coordinates[1][0][2][1]).toBe(1)
+
+    const wktString = converter.fromGeoJson(json).toWkt(true)
+    expect(wktString).toBe(sourceWkt)
+  })
 })

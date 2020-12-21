@@ -45,7 +45,7 @@ export class ReProjector {
     return new ReProjector()
   }
 
-  private init () {
+  private init (): void {
     console.debug('Initializing ReProjector')
     // Load any preset projections
     // BC Albers
@@ -78,7 +78,7 @@ export class ReProjector {
    * @param code Your desired code
    * @param definition The proj4 definition string
    */
-  public addDefinition (code: string, definition: string) {
+  public addDefinition (code: string, definition: string): ReProjector {
     console.debug(`Adding definition ${code} - ${definition}`)
     proj4.defs(code, definition)
     return this
@@ -192,7 +192,7 @@ export class ReProjector {
     return clonedFeature
   }
 
-  private projectGeometry(geometry: Geometry) {
+  private projectGeometry(geometry: Geometry): void {
     switch (geometry.type) {
       case 'Point': { 
         this.projectPoint(geometry.coordinates)
@@ -222,22 +222,23 @@ export class ReProjector {
     }
   }
 
-  private projectPolygon (polygon: Position[][]) {
+  private projectPolygon (polygon: Position[][]): void {
     for (let i = 0; i < polygon.length; i++) {
       this.projectLineString(polygon[i])
     }
   }
 
-  private projectLineString(lineString: Position[]) {
+  private projectLineString(lineString: Position[]): void {
     for (let i = 0; i < lineString.length; i++) {
       this.projectPoint(lineString[i])
     }
   }
 
-  private projectPoint(coords: Position) {
+  private projectPoint(coords: Position): void {
     const projectedCoords = proj4(this.fromProjection, this.toProjection, coords)
 
-    coords[0] = projectedCoords[0]
-    coords[1] = projectedCoords[1]
+    for (let i = 0; i < projectedCoords.length; i++) {
+      coords[i] = projectedCoords[i]
+    }
   }
 }

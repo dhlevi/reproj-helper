@@ -36,7 +36,7 @@ export declare class ReProjector {
      * @param code Your desired code
      * @param definition The proj4 definition string
      */
-    addDefinition(code: string, definition: string): this;
+    addDefinition(code: string, definition: string): ReProjector;
     /**
      * Set the feature you wish to project. The projected feature will be a deep copy
      * The original feature passed in will be untouched.

@@ -1,12 +1,14 @@
-import { __awaiter, __generator } from "tslib";
-import { ReProjector } from "../src/reprojector";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
+var reprojector_1 = require("../src/reprojector");
 describe('Reprojector.ts', function () {
-    it('Test epsg def', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test epsg def', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var projector, json;
-        return __generator(this, function (_a) {
+        return tslib_1.__generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    projector = new ReProjector();
+                    projector = new reprojector_1.ReProjector();
                     return [4 /*yield*/, projector.addDefinitionFromEpsgIo('EPSG:2154')];
                 case 1:
                     _a.sent();
@@ -22,12 +24,12 @@ describe('Reprojector.ts', function () {
             }
         });
     }); });
-    it('Test Point projection', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test Point projection', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var projector, json;
-        return __generator(this, function (_a) {
+        return tslib_1.__generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    projector = new ReProjector();
+                    projector = new reprojector_1.ReProjector();
                     return [4 /*yield*/, projector.feature({
                             type: 'Point',
                             coordinates: [0, 0]
@@ -40,12 +42,12 @@ describe('Reprojector.ts', function () {
             }
         });
     }); });
-    it('Test LineString projection', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test LineString projection', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var projector, json;
-        return __generator(this, function (_a) {
+        return tslib_1.__generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    projector = new ReProjector();
+                    projector = new reprojector_1.ReProjector();
                     return [4 /*yield*/, projector.feature({
                             type: 'LineString',
                             coordinates: [[0, 0], [1, 1]]
@@ -60,12 +62,12 @@ describe('Reprojector.ts', function () {
             }
         });
     }); });
-    it('Test Polygon projection', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test Polygon projection', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var projector, json;
-        return __generator(this, function (_a) {
+        return tslib_1.__generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    projector = new ReProjector();
+                    projector = new reprojector_1.ReProjector();
                     return [4 /*yield*/, projector.feature({
                             type: 'Polygon',
                             coordinates: [[[0, 0], [1, 1], [2, 2], [0, 0]]]
@@ -82,12 +84,12 @@ describe('Reprojector.ts', function () {
             }
         });
     }); });
-    it('Test Feature projection', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test Feature projection', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var projector, json;
-        return __generator(this, function (_a) {
+        return tslib_1.__generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    projector = new ReProjector();
+                    projector = new reprojector_1.ReProjector();
                     return [4 /*yield*/, projector.feature({
                             type: 'Feature',
                             geometry: {
@@ -104,12 +106,12 @@ describe('Reprojector.ts', function () {
             }
         });
     }); });
-    it('Test FeatureCollection projection', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test FeatureCollection projection', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var projector, json;
-        return __generator(this, function (_a) {
+        return tslib_1.__generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    projector = new ReProjector();
+                    projector = new reprojector_1.ReProjector();
                     return [4 /*yield*/, projector.feature({
                             type: 'FeatureCollection',
                             features: [{

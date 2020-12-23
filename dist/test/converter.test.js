@@ -1,10 +1,12 @@
-import { __awaiter, __generator } from "tslib";
-import { FormatConverter } from "../src/format-converter";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
+var format_converter_1 = require("../src/format-converter");
 describe('format-converter.ts', function () {
-    it('Test fail on empty', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test fail on empty', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, failed, result;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             failed = false;
             try {
                 result = converter.fromWkt('POINT EMPTY').toGeoJson();
@@ -17,10 +19,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt point conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt point conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString, sourceMWkt, mjson, mwktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'POINT (0 0)';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
@@ -41,10 +43,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt MultiPoint conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt MultiPoint conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'MULTIPOINT (0 0, 1 1, 2 2)';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
@@ -60,10 +62,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt line conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt line conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'LINESTRING (0 0, 1 1, 2 2)';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
@@ -79,10 +81,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt multiline conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt multiline conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'MULTILINESTRING ((0 0, 1 1, 2 2), (3 3, 4 4, 5 5))';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
@@ -104,10 +106,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt polygon conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt polygon conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, json, sourceWkt, interiorRingJson, geom, exteriorRing, interiorRing, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             json = converter.fromWkt('POLYGON ((0 0, 1 1, 2 2, 0 0))').toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
             expect(json === null || json === void 0 ? void 0 : json.geometry.type).toBe('Polygon');
@@ -148,10 +150,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt multipolygon conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt multipolygon conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, interiorRingJson, geom, firstPoly, secondPoly, exteriorRing, interiorRing, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'MULTIPOLYGON (((40 40, 20 45, 45 30, 40 40)), ((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 20 25, 30 20)))';
             interiorRingJson = converter.fromWkt(sourceWkt).toGeoJson();
             expect(interiorRingJson === null || interiorRingJson === void 0 ? void 0 : interiorRingJson.type).toBe('Feature');
@@ -178,10 +180,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt Geometry collection conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt Geometry collection conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'GEOMETRYCOLLECTION (POINT (40 10), LINESTRING (10 10, 20 20, 10 40), POLYGON ((40 40, 20 45, 45 30, 40 40)))';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
@@ -191,10 +193,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt triangle to polygon conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt triangle to polygon conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'TRIANGLE ((0 0 0, 0 1 0, 1 1 0, 0 0 0))';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');
@@ -210,10 +212,10 @@ describe('format-converter.ts', function () {
             return [2 /*return*/];
         });
     }); });
-    it('Test wkt TIN to multipolygon conversion', function () { return __awaiter(void 0, void 0, void 0, function () {
+    it('Test wkt TIN to multipolygon conversion', function () { return tslib_1.__awaiter(void 0, void 0, void 0, function () {
         var converter, sourceWkt, json, wktString;
-        return __generator(this, function (_a) {
-            converter = new FormatConverter();
+        return tslib_1.__generator(this, function (_a) {
+            converter = new format_converter_1.FormatConverter();
             sourceWkt = 'TIN (((0 0 0, 0 0 1, 0 1 0, 0 0 0)), ((0 0 0, 0 1 0, 1 1 0, 0 0 0)))';
             json = converter.fromWkt(sourceWkt).toGeoJson();
             expect(json === null || json === void 0 ? void 0 : json.type).toBe('Feature');

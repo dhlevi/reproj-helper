@@ -25,7 +25,8 @@
     "lint": "tsc --noEmit && eslint \"**/*.ts\" --quiet --fix"
   },
   "dependencies": {
-    "proj4": "^2.6.3"
+    "proj4": "^2.6.3",
+    "ts-deepcopy": "^0.1.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.12.10",
@@ -37,6 +38,8 @@
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.2",
+    "babel-preset-env": "^1.7.0",
     "buffer": "^6.0.3",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",

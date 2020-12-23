@@ -1,5 +1,5 @@
 import { __awaiter, __generator } from "tslib";
-import { deepCopy } from './deep-copy';
+import deepCopy from "ts-deepcopy";
 import { SpatialUtils } from './spatial-utils';
 /**
  * A Spatial Transformation helper that takes an input geometry or collection

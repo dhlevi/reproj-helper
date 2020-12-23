@@ -1,5 +1,5 @@
 import { Feature, FeatureCollection, Geometry, Position } from "geojson"
-import { deepCopy } from "./deep-copy"
+import deepCopy from "ts-deepcopy"
 
 /**
  * FormatConverter is a utilit class that assists with converting

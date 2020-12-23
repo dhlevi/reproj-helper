@@ -1,4 +1,4 @@
-import { LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson";
+import { LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson"
 
 /**
  * A Utilities class containing functions for performing various

@@ -1,7 +1,7 @@
 import { Feature, FeatureCollection, Geometry, Position } from "geojson"
 import proj4 from "proj4"
-import { deepCopy } from "./deep-copy"
-import * as https from "https"
+import deepCopy from "ts-deepcopy"
+import https from "https"
 
 /**
  * A simple Reprojection class that works with Proj4 for 

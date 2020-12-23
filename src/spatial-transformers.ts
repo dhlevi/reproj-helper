@@ -1,6 +1,6 @@
-import { deepCopy } from './deep-copy';
-import { Feature, FeatureCollection, Geometry, MultiPolygon, Point, Polygon, Position } from "geojson";
-import { SpatialUtils } from './spatial-utils';
+import deepCopy from "ts-deepcopy"
+import { Feature, FeatureCollection, Geometry, MultiPolygon, Point, Polygon, Position } from "geojson"
+import { SpatialUtils } from './spatial-utils'
 
 /**
  * A Spatial Transformation helper that takes an input geometry or collection

@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpatialUtils = void 0;
 /**
  * A Utilities class containing functions for performing various
  * helpful utilities, like distance calculations, UTM zone helpers, etc.
@@ -256,5 +253,5 @@ var SpatialUtils = /** @class */ (function () {
     SpatialUtils.RADIUS = 6378137;
     return SpatialUtils;
 }());
-exports.SpatialUtils = SpatialUtils;
+export { SpatialUtils };
 //# sourceMappingURL=spatial-utils.js.map

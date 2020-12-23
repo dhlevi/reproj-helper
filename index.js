@@ -1,13 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.deepCopy = exports.SpatialTransformers = exports.FormatConverter = exports.SpatialUtils = exports.ReProjector = void 0;
-var reprojector_1 = require("./dist/src/reprojector");
-Object.defineProperty(exports, "ReProjector", { enumerable: true, get: function () { return reprojector_1.ReProjector; } });
-var spatial_utils_1 = require("./dist/src/spatial-utils");
-Object.defineProperty(exports, "SpatialUtils", { enumerable: true, get: function () { return spatial_utils_1.SpatialUtils; } });
-var format_converter_1 = require("./dist/src/format-converter");
-Object.defineProperty(exports, "FormatConverter", { enumerable: true, get: function () { return format_converter_1.FormatConverter; } });
-var spatial_transformers_1 = require("./dist/src/spatial-transformers");
-Object.defineProperty(exports, "SpatialTransformers", { enumerable: true, get: function () { return spatial_transformers_1.SpatialTransformers; } });
-var deep_copy_1 = require("./dist/src/deep-copy");
-Object.defineProperty(exports, "deepCopy", { enumerable: true, get: function () { return deep_copy_1.deepCopy; } });
+export { ReProjector } from "./dist/src/reprojector";
+export { SpatialUtils } from "./dist/src/spatial-utils";
+export { FormatConverter } from "./dist/src/format-converter";
+export { SpatialTransformers } from "./dist/src/spatial-transformers";
+export { deepCopy } from "./dist/src/deep-copy";

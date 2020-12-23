@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpatialTransformers = void 0;
-var tslib_1 = require("tslib");
-var deep_copy_1 = require("./deep-copy");
-var spatial_utils_1 = require("./spatial-utils");
+import { __awaiter, __generator } from "tslib";
+import { deepCopy } from './deep-copy';
+import { SpatialUtils } from './spatial-utils';
 /**
  * A Spatial Transformation helper that takes an input geometry or collection
  * of geometries, and transforms the data into something else. The functions
@@ -19,9 +16,9 @@ var SpatialTransformers = /** @class */ (function () {
      * @returns An array of polygons derived from the input features interior rings
      */
     SpatialTransformers.findInteriorRings = function (feature) {
-        return tslib_1.__awaiter(this, void 0, void 0, function () {
+        return __awaiter(this, void 0, void 0, function () {
             var polys, geometry, i, _i, _a, childGeom, i;
-            return tslib_1.__generator(this, function (_b) {
+            return __generator(this, function (_b) {
                 polys = [];
                 geometry = feature.type === 'Feature' ? feature.geometry : feature;
                 if (geometry.type === 'Polygon') {
@@ -54,10 +51,10 @@ var SpatialTransformers = /** @class */ (function () {
    * @returns a cloned copy of the input feature, with interior rings removed
    */
     SpatialTransformers.removeInteriorRings = function (feature) {
-        return tslib_1.__awaiter(this, void 0, void 0, function () {
+        return __awaiter(this, void 0, void 0, function () {
             var clone, geometry, i;
-            return tslib_1.__generator(this, function (_a) {
-                clone = deep_copy_1.deepCopy(feature);
+            return __generator(this, function (_a) {
+                clone = deepCopy(feature);
                 geometry = clone.type === 'Feature' ? clone.geometry : feature;
                 if (geometry.type === 'Polygon') {
                     geometry.coordinates = [geometry.coordinates[0]];
@@ -245,7 +242,7 @@ var SpatialTransformers = /** @class */ (function () {
      * @returns a cloned copy of the feature with precision reduced
      */
     SpatialTransformers.reducePrecision = function (feature, reduceTo) {
-        var clone = deep_copy_1.deepCopy(feature);
+        var clone = deepCopy(feature);
         if (clone.type !== 'Feature') {
             clone = {
                 type: 'Feature',
@@ -255,13 +252,13 @@ var SpatialTransformers = /** @class */ (function () {
         }
         switch (clone.geometry.type) {
             case 'Point': {
-                clone.geometry.coordinates = spatial_utils_1.SpatialUtils.reduceCoordinatePrecision(clone.geometry.coordinates, reduceTo);
+                clone.geometry.coordinates = SpatialUtils.reduceCoordinatePrecision(clone.geometry.coordinates, reduceTo);
                 break;
             }
             case 'LineString':
             case 'MultiPoint': {
                 for (var i = 0; i < clone.geometry.coordinates.length; i++) {
-                    clone.geometry.coordinates[i] = spatial_utils_1.SpatialUtils.reduceCoordinatePrecision(clone.geometry.coordinates[i], reduceTo);
+                    clone.geometry.coordinates[i] = SpatialUtils.reduceCoordinatePrecision(clone.geometry.coordinates[i], reduceTo);
                 }
                 break;
             }
@@ -270,7 +267,7 @@ var SpatialTransformers = /** @class */ (function () {
                 for (var _i = 0, _a = clone.geometry.coordinates; _i < _a.length; _i++) {
                     var ring = _a[_i];
                     for (var i = 0; i < ring.length; i++) {
-                        ring[i] = spatial_utils_1.SpatialUtils.reduceCoordinatePrecision(ring[i], reduceTo);
+                        ring[i] = SpatialUtils.reduceCoordinatePrecision(ring[i], reduceTo);
                     }
                 }
                 break;
@@ -281,7 +278,7 @@ var SpatialTransformers = /** @class */ (function () {
                     for (var _d = 0, poly_3 = poly; _d < poly_3.length; _d++) {
                         var ring = poly_3[_d];
                         for (var i = 0; i < ring.length; i++) {
-                            ring[i] = spatial_utils_1.SpatialUtils.reduceCoordinatePrecision(ring[i], reduceTo);
+                            ring[i] = SpatialUtils.reduceCoordinatePrecision(ring[i], reduceTo);
                         }
                     }
                 }
@@ -301,7 +298,7 @@ var SpatialTransformers = /** @class */ (function () {
      * @returns an array of coordinates
      */
     SpatialTransformers.explodeVertices = function (feature) {
-        var clone = deep_copy_1.deepCopy(feature);
+        var clone = deepCopy(feature);
         if (clone.type !== 'Feature') {
             clone = {
                 type: 'Feature',
@@ -380,7 +377,7 @@ var SpatialTransformers = /** @class */ (function () {
             };
         }
         // Now we have a collection of vertices. Sort
-        vertices.sort(spatial_utils_1.SpatialUtils.compareCoordinates);
+        vertices.sort(SpatialUtils.compareCoordinates);
         // and return the hull as a polygon
         // https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
         var upperHull = [];
@@ -429,5 +426,5 @@ var SpatialTransformers = /** @class */ (function () {
     SpatialTransformers.RADIUS = 6378137;
     return SpatialTransformers;
 }());
-exports.SpatialTransformers = SpatialTransformers;
+export { SpatialTransformers };
 //# sourceMappingURL=spatial-transformers.js.map

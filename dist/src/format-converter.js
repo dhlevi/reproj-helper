@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormatConverter = void 0;
-var deep_copy_1 = require("./deep-copy");
+import { deepCopy } from "./deep-copy";
 /**
  * FormatConverter is a utilit class that assists with converting
  * some spatial formats to others.
@@ -47,7 +44,7 @@ var FormatConverter = /** @class */ (function () {
      * @param json GeoJSON feature
      */
     FormatConverter.prototype.fromGeoJson = function (json) {
-        this.sourceJson = deep_copy_1.deepCopy(json);
+        this.sourceJson = deepCopy(json);
         return this;
     };
     /**
@@ -284,5 +281,5 @@ var FormatConverter = /** @class */ (function () {
     };
     return FormatConverter;
 }());
-exports.FormatConverter = FormatConverter;
+export { FormatConverter };
 //# sourceMappingURL=format-converter.js.map

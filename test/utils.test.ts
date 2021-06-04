@@ -9,6 +9,10 @@ describe('spatial-utils.ts', () => {
     const dmsStrings = SpatialUtils.latLonToDmsString(55.8878, 122.3987, true)
     expect(dmsStrings.latitudeDMS).toBe("55° 53' 16.08\" N")
     expect(dmsStrings.longitudeDMS).toBe("122° 23' 55.32\" E")
+
+    const negativeDmsStrings = SpatialUtils.latLonToDmsString(-55.8878, -122.3987, true)
+    expect(negativeDmsStrings.latitudeDMS).toBe("-55° 53' 16.08\" S")
+    expect(negativeDmsStrings.longitudeDMS).toBe("-122° 23' 55.32\" W")
   })
   it('Test UTM utils', () => {
     const zone = SpatialUtils.utmZone(52.555, -122.123)

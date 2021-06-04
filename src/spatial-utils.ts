@@ -61,8 +61,8 @@ export class SpatialUtils {
    */
   public static ddToDmsString (dd: number, showMarks: boolean, maxDecimals = 2): string {
     const d = Math.trunc(dd)
-    const m = Math.floor((dd - d) * 60)
-    const s = this.reducePrecision((dd - d - m / 60) * 3600, maxDecimals)
+    const m = Math.floor((Math.abs(dd) - Math.abs(d)) * 60)
+    const s = this.reducePrecision((Math.abs(dd) - Math.abs(d) - m / 60) * 3600, maxDecimals)
     return showMarks ? `${d}° ${m}' ${s}"` : `${d} ${m} ${s}`
   }
 

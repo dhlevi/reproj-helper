@@ -59,9 +59,9 @@ var SpatialUtils = /** @class */ (function () {
      */
     SpatialUtils.ddToDmsString = function (dd, showMarks, maxDecimals) {
         if (maxDecimals === void 0) { maxDecimals = 2; }
-        var d = Math.floor(dd);
-        var m = Math.floor((dd - d) * 60);
-        var s = this.reducePrecision((dd - d - m / 60) * 3600, maxDecimals);
+        var d = Math.trunc(dd);
+        var m = Math.floor((Math.abs(dd) - Math.abs(d)) * 60);
+        var s = this.reducePrecision((Math.abs(dd) - Math.abs(d) - m / 60) * 3600, maxDecimals);
         return showMarks ? d + "\u00B0 " + m + "' " + s + "\"" : d + " " + m + " " + s;
     };
     /**

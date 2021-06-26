@@ -62,7 +62,35 @@ var SpatialUtils = /** @class */ (function () {
         var d = Math.trunc(dd);
         var m = Math.floor((Math.abs(dd) - Math.abs(d)) * 60);
         var s = this.reducePrecision((Math.abs(dd) - Math.abs(d) - m / 60) * 3600, maxDecimals);
+        if (s >= 60) {
+            s -= 60;
+            m += 1;
+        }
         return showMarks ? d + "\u00B0 " + m + "' " + s + "\"" : d + " " + m + " " + s;
+    };
+    SpatialUtils.dmsToDdString = function (dms, maxDecimals) {
+        if (maxDecimals === void 0) { maxDecimals = 6; }
+        var splitDms = dms.split(' ');
+        if (splitDms.length < 3) {
+            return Number.NaN;
+        }
+        var degrees = parseInt(splitDms[0].replace(/[^0-9.-]/g, ''));
+        var minutes = parseInt(splitDms[1].replace(/[^0-9.-]/g, ''));
+        var seconds = parseFloat(splitDms[2].replace(/[^0-9.-]/g, ''));
+        if (isNaN(degrees) || isNaN(minutes) || isNaN(seconds)) {
+            return Number.NaN;
+        }
+        var dd = Math.abs(degrees) + (minutes / 60) + (seconds / 3600);
+        if (degrees < 0) {
+            dd *= -1;
+        }
+        // truncate to maxDecimals decimal places
+        var ddSplit = dd.toString().split('.');
+        if (ddSplit.length > 1 && ddSplit[1].length > 5) {
+            return parseFloat(dd.toFixed(maxDecimals));
+        }
+        // otherwise return with the precision as is
+        return dd;
     };
     /**
      * Generates DMS string for a given latitude and longitude

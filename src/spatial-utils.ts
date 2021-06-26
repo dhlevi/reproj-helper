@@ -61,9 +61,43 @@ export class SpatialUtils {
    */
   public static ddToDmsString (dd: number, showMarks: boolean, maxDecimals = 2): string {
     const d = Math.trunc(dd)
-    const m = Math.floor((Math.abs(dd) - Math.abs(d)) * 60)
-    const s = this.reducePrecision((Math.abs(dd) - Math.abs(d) - m / 60) * 3600, maxDecimals)
+    let m = Math.floor((Math.abs(dd) - Math.abs(d)) * 60)
+    let s = this.reducePrecision((Math.abs(dd) - Math.abs(d) - m / 60) * 3600, maxDecimals)
+    if (s >= 60) {
+      s -= 60;
+      m += 1;
+    }
     return showMarks ? `${d}° ${m}' ${s}"` : `${d} ${m} ${s}`
+  }
+
+  public static dmsToDdString (dms: string, maxDecimals = 6): number {
+    const splitDms = dms.split(' ')
+
+    if (splitDms.length < 3) {
+      return Number.NaN
+    }
+
+    const degrees = parseInt(splitDms[0].replace(/[^0-9.-]/g,''))
+    const minutes = parseInt(splitDms[1].replace(/[^0-9.-]/g,''))
+    const seconds = parseFloat(splitDms[2].replace(/[^0-9.-]/g, ''))
+
+    if (isNaN(degrees) || isNaN(minutes) || isNaN(seconds)) {
+      return Number.NaN
+    }
+
+    let dd = Math.abs(degrees) + (minutes / 60) + (seconds / 3600);
+
+    if (degrees < 0) {
+      dd *= -1;
+    }
+
+    // truncate to maxDecimals decimal places
+    const ddSplit = dd.toString().split('.')
+    if (ddSplit.length > 1 && ddSplit[1].length > 5) {
+        return parseFloat(dd.toFixed(maxDecimals))
+    }
+    // otherwise return with the precision as is
+    return dd
   }
 
   /**

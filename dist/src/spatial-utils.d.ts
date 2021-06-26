@@ -28,6 +28,7 @@ export declare class SpatialUtils {
      * @param showMarks Show degree characters
      */
     static ddToDmsString(dd: number, showMarks: boolean, maxDecimals?: number): string;
+    static dmsToDdString(dms: string, maxDecimals?: number): number;
     /**
      * Generates DMS string for a given latitude and longitude
      * @param latitude The latitude

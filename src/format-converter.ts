@@ -69,6 +69,11 @@ export class FormatConverter {
       throw new Error('No WKT data supplied')
     }
 
+    // add a space between the first bracket and the type, if there isn't one
+    if (this.sourceWkt.includes('(') && this.sourceWkt[this.sourceWkt.indexOf('(') - 1] !== ' ') {
+      this.sourceWkt = this.sourceWkt.slice(0, this.sourceWkt.indexOf('(')) + ' ' + this.sourceWkt.slice(this.sourceWkt.indexOf('('));
+    }
+
     const type = this.sourceWkt.split(' ')[0].trim().toUpperCase()
     const typeMod = this.sourceWkt.split(' ')[1].trim().toUpperCase()
     const unsupported = ['EMPTY'].includes(typeMod)

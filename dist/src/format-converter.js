@@ -60,6 +60,10 @@ var FormatConverter = /** @class */ (function () {
         if (!this.sourceWkt || this.sourceWkt.length === 0) {
             throw new Error('No WKT data supplied');
         }
+        // add a space between the first bracket and the type, if there isn't one
+        if (this.sourceWkt.includes('(') && this.sourceWkt[this.sourceWkt.indexOf('(') - 1] !== ' ') {
+            this.sourceWkt = this.sourceWkt.slice(0, this.sourceWkt.indexOf('(')) + ' ' + this.sourceWkt.slice(this.sourceWkt.indexOf('('));
+        }
         var type = this.sourceWkt.split(' ')[0].trim().toUpperCase();
         var typeMod = this.sourceWkt.split(' ')[1].trim().toUpperCase();
         var unsupported = ['EMPTY'].includes(typeMod);

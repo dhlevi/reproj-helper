@@ -4,7 +4,7 @@ import { LineString, MultiLineString, MultiPolygon, Polygon, Position } from "ge
  * helpful utilities, like distance calculations, UTM zone helpers, etc.
  */
 export declare class SpatialUtils {
-    static readonly RADIUS = 6378137;
+    static readonly RADIUS = 6371008.7714;
     /**
      * Returns the UTM Zone for a given longitude. Includes rules beyond just BC/Canada
      * @param latitude The Latitude. Needed to determine zones with special rules (Svalbard)
@@ -28,6 +28,12 @@ export declare class SpatialUtils {
      * @param showMarks Show degree characters
      */
     static ddToDmsString(dd: number, showMarks: boolean, maxDecimals?: number): string;
+    /**
+     *
+     * @param dms The DMS string to parse
+     * @param maxDecimals The maximum decimal precision to return
+     * @returns Converted decimal degrees, or NaN if the DMS string is invalid
+     */
     static dmsToDdString(dms: string, maxDecimals?: number): number;
     /**
      * Generates DMS string for a given latitude and longitude
@@ -36,10 +42,7 @@ export declare class SpatialUtils {
      * @param showMarks Show degree characters
      * @returns Object containing latitude and longitude as DMS strings
      */
-    static latLonToDmsString(latitude: number, longitude: number, showMarks: boolean): {
-        latitudeDMS: string;
-        longitudeDMS: string;
-    };
+    static latLonToDmsString(latitude: number, longitude: number, showMarks: boolean): any;
     /**
      * Calculate the distance between two points in Metres, using the haversine formula
      * @param startCoord Starting coordinates
@@ -86,6 +89,12 @@ export declare class SpatialUtils {
      */
     static degreesToRadians(degrees: number): number;
     /**
+     * Convert radians to decimal degrees
+     * @param radians the radians
+     * @returns the decimal degrees
+     */
+    static radiansToDegrees(radians: number): number;
+    /**
      * Reduces the precision of a number
      * @param coord The number to reduce
      * @param reduceTo How many decimals to reduce it to
@@ -100,5 +109,41 @@ export declare class SpatialUtils {
      * @returns A precision-reduced Position
      */
     static reduceCoordinatePrecision(coords: Position, reduceTo: number): Position;
+    /**
+     * Compare coordinates
+     * @param a Position A
+     * @param b Position B
+     * @returns Comparison
+     */
     static compareCoordinates(a: Position, b: Position): number;
+    /**
+     * Find a point at the middle of two other points. This method is not geodesic, therefore only useful when accuracy is not needed or for very small distances
+     * @param pointA The first point
+     * @param pointB The second point
+     * @returns Position representing the Midpoint between Point 'A' and Point 'B'
+     */
+    static midPoint(pointA: Position, pointB: Position): Position;
+    /**
+     * Find a point at the middle of two other points. This method uses haversine distance and conforms to the curvature of the earth
+     * @param pointA The first point
+     * @param pointB The second point
+     * @returns Position representing the Midpoint between Point 'A' and Point 'B'
+     */
+    static midpointGeodesic(pointA: Position, pointB: Position): Position;
+    /**
+     * Find the bearing between two points
+     * https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+     * @param pointA the first point
+     * @param pointB the second point
+     * @returns The bearing, in decimal degrees
+     */
+    static bearing(pointA: Position, pointB: Position): number;
+    /**
+     * Given a point, bearing, and distance in metres, locate the destination point
+     * @param point The starting point
+     * @param distance The distance in metres
+     * @param bearing The bearing
+     * @returns Position representing the destination
+     */
+    static destinationPoint(point: Position, distance: number, bearing: number): Position;
 }

@@ -1,11 +1,12 @@
-import { LineString, MultiLineString, MultiPolygon, Polygon, Position } from "geojson"
+import { LineString, MultiLineString, MultiPolygon, Point, Polygon, Position } from "geojson"
 
 /**
  * A Utilities class containing functions for performing various
  * helpful utilities, like distance calculations, UTM zone helpers, etc.
  */
 export class SpatialUtils {
-  public static readonly RADIUS = 6378137
+  // https://en.wikipedia.org/wiki/Earth_radius
+  public static readonly RADIUS = 6371008.7714
   /**
    * Returns the UTM Zone for a given longitude. Includes rules beyond just BC/Canada
    * @param latitude The Latitude. Needed to determine zones with special rules (Svalbard)
@@ -70,6 +71,12 @@ export class SpatialUtils {
     return showMarks ? `${d}° ${m}' ${s}"` : `${d} ${m} ${s}`
   }
 
+  /**
+   * 
+   * @param dms The DMS string to parse
+   * @param maxDecimals The maximum decimal precision to return
+   * @returns Converted decimal degrees, or NaN if the DMS string is invalid
+   */
   public static dmsToDdString (dms: string, maxDecimals = 6): number {
     const splitDms = dms.split(' ')
 
@@ -88,7 +95,7 @@ export class SpatialUtils {
     let dd = Math.abs(degrees) + (minutes / 60) + (seconds / 3600);
 
     if (degrees < 0) {
-      dd *= -1;
+      dd *= -1; // Set if we're west
     }
 
     // truncate to maxDecimals decimal places
@@ -107,7 +114,7 @@ export class SpatialUtils {
    * @param showMarks Show degree characters
    * @returns Object containing latitude and longitude as DMS strings
    */
-  public static latLonToDmsString (latitude: number, longitude: number, showMarks: boolean) {
+  public static latLonToDmsString (latitude: number, longitude: number, showMarks: boolean): any {
     return {
       latitudeDMS: `${this.ddToDmsString(latitude, showMarks)} ${(latitude < 0 ? 'S' : 'N')}`,
       longitudeDMS: `${this.ddToDmsString(longitude, showMarks)} ${(longitude < 0 ? 'W' : 'E')}`
@@ -264,8 +271,17 @@ export class SpatialUtils {
    * @param degrees the decimal degrees
    * @returns the degree in radians
    */
-  public static degreesToRadians(degrees: number): number {
-    return (degrees * Math.PI) / 180;
+  public static degreesToRadians (degrees: number): number {
+    return (degrees * Math.PI) / 180
+  }
+
+  /**
+   * Convert radians to decimal degrees
+   * @param radians the radians
+   * @returns the decimal degrees
+   */
+  public static radiansToDegrees (radians: number): number {
+    return radians * (180 / Math.PI)
   }
 
   /**
@@ -289,11 +305,87 @@ export class SpatialUtils {
     return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)]
   }
 
+  /**
+   * Compare coordinates
+   * @param a Position A
+   * @param b Position B
+   * @returns Comparison
+   */
   public static compareCoordinates (a: Position, b: Position): number {
 		if (a[0] < b[0]) return -1
 		else if (a[0] > b[0]) return 1
 		else if (a[1] < b[1]) return -1
 		else if (a[1] > b[1]) return 1
 		else return 0
+  }
+
+  /**
+   * Find a point at the middle of two other points. This method is not geodesic, therefore only useful when accuracy is not needed or for very small distances
+   * @param pointA The first point
+   * @param pointB The second point
+   * @returns Position representing the Midpoint between Point 'A' and Point 'B'
+   */
+  public static midPoint (pointA: Position, pointB: Position ): Position {
+    return [(pointA[0] + pointB[0]) / 2.0, (pointA[1] + pointB[1]) / 2.0]
+  }
+
+  /**
+   * Find a point at the middle of two other points. This method uses haversine distance and conforms to the curvature of the earth
+   * @param pointA The first point
+   * @param pointB The second point
+   * @returns Position representing the Midpoint between Point 'A' and Point 'B'
+   */
+  public static midpointGeodesic (pointA: Position, pointB: Position ): Position {
+    // find the geodesic distance using the haversine method
+    const distance = this.haversineDistance(pointA, pointB)
+    // find the bearing between the two points
+    const bearing = this.bearing(pointA, pointB)
+    // return the point by finding the destination at half the distance and at the given bearing
+    return this.destinationPoint(pointA, distance / 2.0, bearing)
+  }
+
+  /**
+   * Find the bearing between two points
+   * https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+   * @param pointA the first point
+   * @param pointB the second point
+   * @returns The bearing, in decimal degrees
+   */
+  public static bearing (pointA: Position, pointB: Position ): number {
+    // get the lat/long radians
+    const longitudeA = this.degreesToRadians(pointA[0])
+    const longitudeB = this.degreesToRadians(pointB[0])
+    const latitudeA = this.degreesToRadians(pointA[1])
+    const latitudeB = this.degreesToRadians(pointB[1])
+  
+    const a = Math.sin(longitudeB - longitudeA) * Math.cos(latitudeB)
+    const b = Math.cos(latitudeA) * Math.sin(latitudeB) - Math.sin(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA)
+  
+    return this.radiansToDegrees(Math.atan2(a, b))
+  }
+
+  /**
+   * Given a point, bearing, and distance in metres, locate the destination point
+   * @param point The starting point
+   * @param distance The distance in metres
+   * @param bearing The bearing
+   * @returns Position representing the destination
+   */
+  public static destinationPoint (point: Position, distance: number, bearing: number): Position {
+    // get the lat/long, bearing and distance radians
+    const longitudeRads = this.degreesToRadians(point[0])
+    const latitudeRads = this.degreesToRadians(point[1])
+    const bearingRads = this.degreesToRadians(bearing)
+    const distRads = distance / this.RADIUS
+  
+    // claculate the destination lat/long
+    const destinationLat = Math.asin(Math.sin(latitudeRads) * Math.cos(distRads) + Math.cos(latitudeRads) * Math.sin(distRads) * Math.cos(bearingRads))
+    const destinationLong = longitudeRads + Math.atan2(Math.sin(bearingRads) * Math.sin(distRads) * Math.cos(latitudeRads), Math.cos(distRads) - Math.sin(latitudeRads) * Math.sin(destinationLat))
+
+    // convert the rads to degrees
+    const finalLong = this.radiansToDegrees(destinationLong)
+    const finalLat = this.radiansToDegrees(destinationLat)
+  
+    return [finalLong, finalLat]
   }
 }

@@ -9,6 +9,10 @@ describe('spatial-utils.ts', function () {
         var negativeDmsStrings = SpatialUtils.latLonToDmsString(-55.8878, -122.3987, true);
         expect(negativeDmsStrings.latitudeDMS).toBe("-55° 53' 16.08\" S");
         expect(negativeDmsStrings.longitudeDMS).toBe("-122° 23' 55.32\" W");
+        var ddVal = SpatialUtils.dmsToDdString(dmsStrings.latitudeDMS);
+        expect(ddVal).toBe(55.8878);
+        var ddValNegative = SpatialUtils.dmsToDdString(negativeDmsStrings.latitudeDMS);
+        expect(ddValNegative).toBe(-55.8878);
     });
     it('Test UTM utils', function () {
         var zone = SpatialUtils.utmZone(52.555, -122.123);
@@ -26,16 +30,16 @@ describe('spatial-utils.ts', function () {
     });
     it('Test Haversine Distance', function () {
         var distanceMS = SpatialUtils.haversineDistance([0, 0], [5, 5]);
-        expect(distanceMS).toEqual(786647.4626653906);
+        expect(distanceMS).toEqual(785768.3026627928);
         var reducedPrecision = SpatialUtils.reducePrecision(distanceMS, 3);
-        expect(reducedPrecision).toEqual(786647.463);
+        expect(reducedPrecision).toEqual(785768.303);
     });
     it('Test LineString Distance', function () {
         var distanceMS = SpatialUtils.lineLength({
             type: 'LineString',
             coordinates: [[0, 0], [5, 5], [10, 10]]
         });
-        expect(distanceMS).toEqual(1570303.4399846792);
+        expect(distanceMS).toEqual(1568548.4632741483);
     });
     it('Test Polygon Perimetre and Area', function () {
         var poly = {
@@ -44,8 +48,16 @@ describe('spatial-utils.ts', function () {
         };
         var areaMS = SpatialUtils.polygonArea(poly);
         var distanceMS = SpatialUtils.polygonPerimeter(poly);
-        expect(areaMS).toEqual(3339946239196.927);
-        expect(distanceMS).toEqual(9391624.93439981);
+        expect(areaMS).toEqual(3332484939319.652);
+        expect(distanceMS).toEqual(9381128.820964513);
+    });
+    it('Test midpoint calculation', function () {
+        var mp = SpatialUtils.midPoint([125, -15], [113, -22]);
+        var mpg = SpatialUtils.midpointGeodesic([125, -15], [113, -22]);
+        expect(mp[0]).toEqual(119);
+        expect(mpg[0]).toEqual(119.12323898782398);
+        expect(mp[1]).toEqual(-18.5);
+        expect(mpg[1]).toEqual(-18.594873981168643);
     });
 });
 //# sourceMappingURL=utils.test.js.map

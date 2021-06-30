@@ -68,6 +68,12 @@ var SpatialUtils = /** @class */ (function () {
         }
         return showMarks ? d + "\u00B0 " + m + "' " + s + "\"" : d + " " + m + " " + s;
     };
+    /**
+     *
+     * @param dms The DMS string to parse
+     * @param maxDecimals The maximum decimal precision to return
+     * @returns Converted decimal degrees, or NaN if the DMS string is invalid
+     */
     SpatialUtils.dmsToDdString = function (dms, maxDecimals) {
         if (maxDecimals === void 0) { maxDecimals = 6; }
         var splitDms = dms.split(' ');
@@ -82,7 +88,7 @@ var SpatialUtils = /** @class */ (function () {
         }
         var dd = Math.abs(degrees) + (minutes / 60) + (seconds / 3600);
         if (degrees < 0) {
-            dd *= -1;
+            dd *= -1; // Set if we're west
         }
         // truncate to maxDecimals decimal places
         var ddSplit = dd.toString().split('.');
@@ -248,6 +254,14 @@ var SpatialUtils = /** @class */ (function () {
         return (degrees * Math.PI) / 180;
     };
     /**
+     * Convert radians to decimal degrees
+     * @param radians the radians
+     * @returns the decimal degrees
+     */
+    SpatialUtils.radiansToDegrees = function (radians) {
+        return radians * (180 / Math.PI);
+    };
+    /**
      * Reduces the precision of a number
      * @param coord The number to reduce
      * @param reduceTo How many decimals to reduce it to
@@ -266,6 +280,12 @@ var SpatialUtils = /** @class */ (function () {
     SpatialUtils.reduceCoordinatePrecision = function (coords, reduceTo) {
         return [this.reducePrecision(coords[0], reduceTo), this.reducePrecision(coords[1], reduceTo)];
     };
+    /**
+     * Compare coordinates
+     * @param a Position A
+     * @param b Position B
+     * @returns Comparison
+     */
     SpatialUtils.compareCoordinates = function (a, b) {
         if (a[0] < b[0])
             return -1;
@@ -278,7 +298,69 @@ var SpatialUtils = /** @class */ (function () {
         else
             return 0;
     };
-    SpatialUtils.RADIUS = 6378137;
+    /**
+     * Find a point at the middle of two other points. This method is not geodesic, therefore only useful when accuracy is not needed or for very small distances
+     * @param pointA The first point
+     * @param pointB The second point
+     * @returns Position representing the Midpoint between Point 'A' and Point 'B'
+     */
+    SpatialUtils.midPoint = function (pointA, pointB) {
+        return [(pointA[0] + pointB[0]) / 2.0, (pointA[1] + pointB[1]) / 2.0];
+    };
+    /**
+     * Find a point at the middle of two other points. This method uses haversine distance and conforms to the curvature of the earth
+     * @param pointA The first point
+     * @param pointB The second point
+     * @returns Position representing the Midpoint between Point 'A' and Point 'B'
+     */
+    SpatialUtils.midpointGeodesic = function (pointA, pointB) {
+        // find the geodesic distance using the haversine method
+        var distance = this.haversineDistance(pointA, pointB);
+        // find the bearing between the two points
+        var bearing = this.bearing(pointA, pointB);
+        // return the point by finding the destination at half the distance and at the given bearing
+        return this.destinationPoint(pointA, distance / 2.0, bearing);
+    };
+    /**
+     * Find the bearing between two points
+     * https://www.igismap.com/formula-to-find-bearing-or-heading-angle-between-two-points-latitude-longitude/
+     * @param pointA the first point
+     * @param pointB the second point
+     * @returns The bearing, in decimal degrees
+     */
+    SpatialUtils.bearing = function (pointA, pointB) {
+        // get the lat/long radians
+        var longitudeA = this.degreesToRadians(pointA[0]);
+        var longitudeB = this.degreesToRadians(pointB[0]);
+        var latitudeA = this.degreesToRadians(pointA[1]);
+        var latitudeB = this.degreesToRadians(pointB[1]);
+        var a = Math.sin(longitudeB - longitudeA) * Math.cos(latitudeB);
+        var b = Math.cos(latitudeA) * Math.sin(latitudeB) - Math.sin(latitudeA) * Math.cos(latitudeB) * Math.cos(longitudeB - longitudeA);
+        return this.radiansToDegrees(Math.atan2(a, b));
+    };
+    /**
+     * Given a point, bearing, and distance in metres, locate the destination point
+     * @param point The starting point
+     * @param distance The distance in metres
+     * @param bearing The bearing
+     * @returns Position representing the destination
+     */
+    SpatialUtils.destinationPoint = function (point, distance, bearing) {
+        // get the lat/long, bearing and distance radians
+        var longitudeRads = this.degreesToRadians(point[0]);
+        var latitudeRads = this.degreesToRadians(point[1]);
+        var bearingRads = this.degreesToRadians(bearing);
+        var distRads = distance / this.RADIUS;
+        // claculate the destination lat/long
+        var destinationLat = Math.asin(Math.sin(latitudeRads) * Math.cos(distRads) + Math.cos(latitudeRads) * Math.sin(distRads) * Math.cos(bearingRads));
+        var destinationLong = longitudeRads + Math.atan2(Math.sin(bearingRads) * Math.sin(distRads) * Math.cos(latitudeRads), Math.cos(distRads) - Math.sin(latitudeRads) * Math.sin(destinationLat));
+        // convert the rads to degrees
+        var finalLong = this.radiansToDegrees(destinationLong);
+        var finalLat = this.radiansToDegrees(destinationLat);
+        return [finalLong, finalLat];
+    };
+    // https://en.wikipedia.org/wiki/Earth_radius
+    SpatialUtils.RADIUS = 6371008.7714;
     return SpatialUtils;
 }());
 export { SpatialUtils };

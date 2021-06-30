@@ -336,8 +336,9 @@ var SpatialTransformers = /** @class */ (function () {
                 break;
             }
             case 'GeometryCollection': {
-                for (var i = 0; i < clone.geometry.geometries.length; i++) {
-                    coords.push.apply(coords, this.explodeVertices(clone.geometry.geometries[i]));
+                for (var _e = 0, _f = clone.geometry.geometries; _e < _f.length; _e++) {
+                    var geom = _f[_e];
+                    coords.push.apply(coords, this.explodeVertices(geom));
                 }
             }
         }
@@ -381,8 +382,8 @@ var SpatialTransformers = /** @class */ (function () {
         // and return the hull as a polygon
         // https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
         var upperHull = [];
-        for (var i = 0; i < vertices.length; i++) {
-            var vertex = vertices[i];
+        for (var _c = 0, vertices_1 = vertices; _c < vertices_1.length; _c++) {
+            var vertex = vertices_1[_c];
             while (upperHull.length >= 2) {
                 if ((upperHull[upperHull.length - 1][0] - upperHull[upperHull.length - 2][0]) * (vertex[1] - upperHull[upperHull.length - 2][1]) >=
                     (upperHull[upperHull.length - 1][1] - upperHull[upperHull.length - 2][1]) * (vertex[0] - upperHull[upperHull.length - 2][0])) {
@@ -423,7 +424,28 @@ var SpatialTransformers = /** @class */ (function () {
             };
         }
     };
-    SpatialTransformers.RADIUS = 6378137;
+    /**
+     * Create a circle from a given point and radius. Optionally, supply a max points for the circles circumfrence. The default is 88.
+     * @param point The centre point of the circle
+     * @param radius The radius of the circle
+     * @param maxPoints The maximum numer of points to generate for the circles polyline (its a polygon in reality), defaults to 88
+     * @returns The GeoJson polygon representation of the circle
+     */
+    SpatialTransformers.circlePoly = function (point, radius, maxPoints) {
+        if (maxPoints === void 0) { maxPoints = 88; }
+        var coordinates = [];
+        for (var i = 0; i < maxPoints; i++) {
+            // use maxPoints to determine how many points to create
+            // for each point, use destinationPoint to find the location
+            coordinates.push(SpatialUtils.destinationPoint(point, radius, (i * -360) / maxPoints));
+        }
+        // close the poly
+        coordinates.push(coordinates[0]);
+        return {
+            type: 'Polygon',
+            coordinates: [coordinates]
+        };
+    };
     return SpatialTransformers;
 }());
 export { SpatialTransformers };

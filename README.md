@@ -80,6 +80,9 @@ These include:
 - Polygon Perimeter (in meters)
 - Polygon Area (in meters squared)
 - Coordinate precision reducer
+- Destination point calculation
+- Mid Point calculation
+- Bearing calculation
 - Spatial Transformations (See the `SpatialTransformers` class)
 - Basic converter for WKT (See the `FormatConverter` class)
 
@@ -122,6 +125,7 @@ There's an addition to the spatial utils class called `SpatialTransformers`. Thi
 - Reduce precision for a feature
 - Explode features (extract all vertices)
 - Convex Hull creator
+- Circle creator
 
 ### Transformers Usage
 

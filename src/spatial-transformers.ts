@@ -9,8 +9,6 @@ import { SpatialUtils } from './spatial-utils'
  * returning a modified clone of the original.
  */
 export class SpatialTransformers {
-  public static readonly RADIUS = 6378137
-
   /**
    * Identify interior rings within a polygon feature, and extract them as polygon objects
    * @param feature The feature to find interior rings within
@@ -320,8 +318,8 @@ export class SpatialTransformers {
         break
       }
       case 'GeometryCollection': {
-        for (let i = 0; i < clone.geometry.geometries.length; i++) {
-          coords.push(...this.explodeVertices(clone.geometry.geometries[i]))
+        for (const geom of clone.geometry.geometries) {
+          coords.push(...this.explodeVertices(geom))
         }
       }
     }
@@ -368,9 +366,7 @@ export class SpatialTransformers {
 		// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
     const upperHull: Position[] = []
     
-		for (let i = 0; i < vertices.length; i++) {
-      const vertex = vertices[i]
-      
+		for (const vertex of vertices) {
 			while (upperHull.length >= 2) {
         if ((upperHull[upperHull.length - 1][0] - upperHull[upperHull.length - 2][0]) * (vertex[1] - upperHull[upperHull.length - 2][1]) >= 
             (upperHull[upperHull.length - 1][1] - upperHull[upperHull.length - 2][1]) * (vertex[0] - upperHull[upperHull.length - 2][0])) {
@@ -413,6 +409,29 @@ export class SpatialTransformers {
         type: 'Polygon',
         coordinates: [upperHull.concat(lowerHull)]
       }
+    }
+  }
+
+  /**
+   * Create a circle from a given point and radius. Optionally, supply a max points for the circles circumfrence. The default is 88.
+   * @param point The centre point of the circle
+   * @param radius The radius of the circle
+   * @param maxPoints The maximum numer of points to generate for the circles polyline (its a polygon in reality), defaults to 88
+   * @returns The GeoJson polygon representation of the circle
+   */
+  public static circlePoly (point: Position, radius: number, maxPoints = 88): Polygon {
+    const coordinates = []
+    for (let i = 0; i < maxPoints; i++) {
+      // use maxPoints to determine how many points to create
+      // for each point, use destinationPoint to find the location
+      coordinates.push(SpatialUtils.destinationPoint(point, radius, (i * -360) / maxPoints))
+    }
+    // close the poly
+    coordinates.push(coordinates[0])
+  
+    return {
+      type: 'Polygon',
+      coordinates: [coordinates]
     }
   }
 }

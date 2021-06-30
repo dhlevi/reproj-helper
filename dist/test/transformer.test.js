@@ -78,5 +78,12 @@ describe('transformer.ts', function () {
         expect(hull.coordinates[0][0]).toEqual([10, 20]);
         expect(hull.coordinates[0][1]).toEqual([15, 40]);
     });
+    it('Test circle', function () {
+        // really simple 10m circle
+        var circle = SpatialTransformers.circlePoly([0, 0], 10, 20);
+        expect(circle.coordinates[0].length).toEqual(21);
+        expect(circle.coordinates[0][0]).toEqual([0, 0.00008993203677616636]);
+        expect(circle.coordinates[0][1]).toEqual([-0.000027790527702608803, 0.00008553044959966504]);
+    });
 });
 //# sourceMappingURL=transformer.test.js.map

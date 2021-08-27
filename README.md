@@ -12,6 +12,8 @@ npm i reproj-helper
 
 This utility acts as a simple wrapper around the Proj4 library, allowing you to pass in valid GeoJSON `FeatureCollection`, `Feature`, `GeometryCollection`, and individual `Geometry` types. All underlying coordinates will be projected to the supplied projection via Proj4.
 
+It's also been extended to include some spatial utility functions and format conversions.
+
 ### Initialized Projection Definitions
 
 The ReProjector class is pre-initialized with several additional projections (that I commonly wind up using at work!),including:
@@ -142,6 +144,28 @@ const modifiedFeature = SpatialTransformers.removeInteriorRings(json)
 const bbox = SpatialTransformers.boundingBox(json)
 
 // etc. etc. etc.
+```
+
+## Spatial Validators / Boolean operations
+
+New in 1.3.0 is an additional package called SpatialValidation that includes a number of functions for spatial boolean tests. These include
+
+- doesIntersect
+- isDisjoint
+- doesContain
+- isWithin
+- doesOverlap
+- doesTouch
+- pointInPolygon
+- PointOnLine
+- pointEquals
+- lineEquals
+- polygonEquals
+- lineTopogrphicallyEquals
+- polygonTopographicallyEquals
+
+```typescript
+SpatialValidator.doesIntersect(geom1, geom2)
 ```
 
 ## Thanks!

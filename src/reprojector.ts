@@ -114,8 +114,7 @@ export class ReProjector {
   }
 
   public definitionIsRegistered (epsgCode: string): boolean {
-    const code = epsgCode.trim().includes(':') ? epsgCode.split(':')[1].trim() : epsgCode.trim()
-    const def = proj4.defs(code)
+    const def = proj4.defs(epsgCode)
     return def != null
   }
 

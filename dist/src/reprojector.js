@@ -101,8 +101,7 @@ var ReProjector = /** @class */ (function () {
         return this;
     };
     ReProjector.prototype.definitionIsRegistered = function (epsgCode) {
-        var code = epsgCode.trim().includes(':') ? epsgCode.split(':')[1].trim() : epsgCode.trim();
-        var def = proj4.defs(code);
+        var def = proj4.defs(epsgCode);
         return def != null;
     };
     /**

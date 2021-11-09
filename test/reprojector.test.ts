@@ -7,7 +7,7 @@ describe('Reprojector.ts', () => {
     const defDoesntExist = projector.definitionIsRegistered('EPSG:2154')
     expect(defDoesntExist).toBeFalsy()
 
-    const defExists = projector.definitionIsRegistered('EPSG:WGS84')
+    const defExists = projector.definitionIsRegistered('WGS84')
     expect(defExists).toBeTruthy()
   })
   it('Test epsg def', async () => {

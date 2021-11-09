@@ -7,7 +7,7 @@ describe('Reprojector.ts', function () {
             projector = new ReProjector();
             defDoesntExist = projector.definitionIsRegistered('EPSG:2154');
             expect(defDoesntExist).toBeFalsy();
-            defExists = projector.definitionIsRegistered('EPSG:WGS84');
+            defExists = projector.definitionIsRegistered('WGS84');
             expect(defExists).toBeTruthy();
             return [2 /*return*/];
         });

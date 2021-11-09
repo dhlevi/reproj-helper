@@ -50,12 +50,24 @@ export class SpatialValidator {
     return false
   }
 
+  /**
+   * Test if a point is within a bounding box. Useful test before checking for within on a polygon feature
+   * @param point The point to test
+   * @param bbox The bounding box
+   * @returns True if the point is within the bounding box
+   */
   public static isPointInBoundingBox (point: Point | Position, bbox: BBox): boolean {
     const x = "coordinates" in point ? point.coordinates[0] : point[0]
     const y = "coordinates" in point ? point.coordinates[1] : point[1]
     return bbox[0] <= x && bbox[1] <= y && bbox[2] >= x && bbox[3] >= y
   }
 
+  /**
+   * Test if a point is within a ring
+   * @param point The point to test
+   * @param ring The ring to test
+   * @returns True if the point is within the ring
+   */
   public static isPointInRing (point: Point | Position, ring: Position[]): boolean {
     let isInRing = false
     if (ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]) {
@@ -81,6 +93,12 @@ export class SpatialValidator {
     return isInRing
   }
 
+  /**
+   * Test to determine if a point is within a polygon
+   * @param point The point to test
+   * @param polygon The containing polygon
+   * @returns True if the point is within the polygon
+   */
   public static isPointInPolygon (point: Point | Position, polygon: Polygon | MultiPolygon): boolean {
     if (polygon.bbox && !this.isPointInBoundingBox(point, polygon.bbox)) return false
 
@@ -107,6 +125,12 @@ export class SpatialValidator {
     return false
   }
 
+  /**
+   * Test to determien if a line is within a polygon
+   * @param line Line to compare
+   * @param polygon Polygon that contains the line
+   * @returns True if the line is within the polygon
+   */
   public static isLineInPolygon (line: LineString | Position[], polygon: Polygon | MultiPolygon): boolean {
     const coords = Array.isArray(line) ? line : line.coordinates
     for (const position of coords) {
@@ -116,6 +140,12 @@ export class SpatialValidator {
     return true
   }
 
+  /**
+   * Test to determine if a polygon is inside another polygon (use within)
+   * @param polygon1 The polygon within
+   * @param polygon2 The containing polygon
+   * @returns True if polygon is within the second polygon
+   */
   public static isPolygonInPolygon (polygon1: Polygon | MultiPolygon, polygon2: Polygon | MultiPolygon): boolean {
     // get the poly/multipoly rings. If it's a single poly, wrap it
     const polys = polygon1.type === 'Polygon' ? [polygon1.coordinates] : polygon1.coordinates
@@ -128,6 +158,12 @@ export class SpatialValidator {
     return true
   }
 
+  /**
+   * Test to determine if two coordinates are the same
+   * @param coord1 The first coord to compare
+   * @param coord2 The second coord to compare
+   * @returns 
+   */
   public static coordIsEqual (coord1: Point | Position, coord2: Point | Position): boolean {
     const x1 = "coordinates" in coord1 ? coord1.coordinates[0] : coord1[0]
     const y1 = "coordinates" in coord1 ? coord1.coordinates[1] : coord1[1]
@@ -136,6 +172,12 @@ export class SpatialValidator {
     return x1 === x2 && y1 === y2
   }
 
+  /**
+   * Test to determine if lines are identical (matching vertices)
+   * @param line1 The first line to compare
+   * @param line2 The second line to compare
+   * @returns True if lines are equal
+   */
   public static lineIsEqual (line1: LineString | Position[], line2: LineString | Position[]): boolean {
     const coords1 = Array.isArray(line1) ? line1 : line1.coordinates
     const coords2 = Array.isArray(line2) ? line2 : line2.coordinates
@@ -148,6 +190,12 @@ export class SpatialValidator {
     return true
   }
 
+  /**
+   * Test to determine if two lines are topographically equal (regardless of different vertices)
+   * @param line1 The first line to compare
+   * @param line2 The second line to compare
+   * @returns True if the lines are topographically equal
+   */
   public static lineIsTopographicallyEqual (line1: LineString | Position[], line2: LineString | Position[]): boolean {
     if (this.lineIsEqual(line1, line2)) return true
 
@@ -165,6 +213,12 @@ export class SpatialValidator {
     return true
   }
 
+  /**
+   * Test to determine if two polygons are identical (contain identical vertices)
+   * @param polygon1 the first polygon to compare
+   * @param polygon2 the second polygon to compare
+   * @returns true if polygons are equal
+   */
   public static polygonIsEqual (polygon1: Polygon | Position[][], polygon2: Polygon | Position[][]): boolean {
     const rings1 = Array.isArray(polygon1) ? polygon1 : polygon1.coordinates
     const rings2 = Array.isArray(polygon2) ? polygon2 : polygon2.coordinates
@@ -177,6 +231,12 @@ export class SpatialValidator {
     return true
   }
 
+  /**
+   * Test to determine if a polygon is topographically equal to another polygon, regardless of vertices
+   * @param polygon1 The first polygon to compare
+   * @param polygon2 The second polygon to compare
+   * @returns True if polygons are identical detected
+   */
   public static polygonIsTopographicallyEqual (polygon1: Polygon | Position[][], polygon2: Polygon | Position[][]): boolean {
     if (this.polygonIsEqual(polygon1, polygon2)) return true
 
@@ -212,6 +272,12 @@ export class SpatialValidator {
     return true
   }
 
+  /**
+   * Test to determine if a feature intersects with another feature
+   * @param geometry1 The geometry intersecter
+   * @param geometry2 The geometry to intersectee
+   * @returns True if intersect detected
+   */
   public static doesIntersect (geometry1: Point | LineString | Polygon, geometry2: Point | LineString | Polygon): boolean {
     if (this.isDisjoint(geometry1, geometry2)) return false
     switch (geometry1.type) {
@@ -249,6 +315,12 @@ export class SpatialValidator {
     }
   }
 
+  /**
+   * Test to determine if a feature is disjoint from another feature
+   * @param geometry1 The first geometry
+   * @param geometry2 The second geometry
+   * @returns True if disjoint detected
+   */
   public static isDisjoint (geometry1: Point | LineString | Polygon, geometry2: Point | LineString | Polygon): boolean {
     switch (geometry1.type) {
       case "Point":
@@ -283,6 +355,12 @@ export class SpatialValidator {
     }
   }
 
+  /**
+   * Test to determine if a feature is completely within feature
+   * @param geometry1 The geometry within
+   * @param geometry2 The geometry that contains
+   * @returns True if within detected
+   */
   public static isWithin (geometry1: Point | LineString | Polygon, geometry2: Point | LineString | Polygon): boolean {
     switch (geometry1.type) {
       case "Point":
@@ -320,6 +398,12 @@ export class SpatialValidator {
     return this.isWithin(geometry2, geometry1)
   }
 
+  /**
+   * Test to determine if a feature touches another feature
+   * @param geometry1 The geometry toucher
+   * @param geometry2 The geometry to touchee
+   * @returns True if touch detected
+   */
   public static doesTouch (geometry1: Point | LineString | Polygon, geometry2: Point | LineString | Polygon): boolean {
     switch (geometry1.type) {
       case "Point":
@@ -392,6 +476,12 @@ export class SpatialValidator {
     }
   }
 
+  /**
+   * Test to determine if a feature overlaps another feature
+   * @param geometry1 The geometry overlapper
+   * @param geometry2 The geometry to overlapee
+   * @returns True if overlap detected
+   */
   public static doesOverlap (geometry1: Point | LineString | Polygon, geometry2: Point | LineString | Polygon): boolean {
     const intersections = []
     switch (geometry1.type) {
@@ -482,6 +572,12 @@ export class SpatialValidator {
   }
 
   // From https://github.com/Turfjs/turf/blob/62c45021ecd01913f516f0a637d0a36e93679265/packages/turf-line-intersect/index.ts#L33
+  /**
+   * Test to find intersecting points on a line. Taken from the Turf library (see turfjs: https://turfjs.org/)
+   * @param line1 
+   * @param line2 
+   * @returns Intersecting point
+   */
   public static findIntersectingPoints(line1: LineString | Position[], line2: LineString | Position[]): Position | null {
     const coords1 = Array.isArray(line1) ? line1 : line1.coordinates
     const coords2 = Array.isArray(line2) ? line2 : line2.coordinates

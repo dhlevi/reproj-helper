@@ -70,7 +70,6 @@ Pretty simple! Use the static initializer if you're running a one-off projection
 
 Note: You can also check if a definition exists already in proj4 by calling:
 
-```
 ```Typescript
 const projector = new ReProjector()
 doesExists = projector.definitionIsRegistered('SomeCode')

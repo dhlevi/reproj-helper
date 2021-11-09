@@ -100,7 +100,6 @@ export class ReProjector {
    * @param from Code (usually an EPSG Code)
    */
   public from (from: string): ReProjector {
-    console.debug(`Projecting from ${from}`)
     this.fromProjection = from
     return this
   }
@@ -110,9 +109,14 @@ export class ReProjector {
    * @param from Code (usually an EPSG Code)
    */
   public to (to: string): ReProjector {
-    console.debug(`Projecting to ${to}`)
     this.toProjection = to
     return this
+  }
+
+  public definitionIsRegistered (epsgCode: string): boolean {
+    const code = epsgCode.trim().includes(':') ? epsgCode.split(':')[1].trim() : epsgCode.trim()
+    const def = proj4.defs(code)
+    return def != null
   }
 
   /**

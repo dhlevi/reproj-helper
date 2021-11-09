@@ -1,9 +1,21 @@
 import { ReProjector } from "../src/reprojector"
 
 describe('Reprojector.ts', () => {
+  it('Test def is registered', async () => {
+    const projector = new ReProjector()
+    
+    const defDoesntExist = projector.definitionIsRegistered('EPSG:2154')
+    expect(defDoesntExist).toBeFalsy()
+
+    const defExists = projector.definitionIsRegistered('EPSG:WGS84')
+    expect(defExists).toBeTruthy()
+  })
   it('Test epsg def', async () => {
     const projector = new ReProjector()
     
+    const defExists = projector.definitionIsRegistered('EPSG:2154')
+    expect(defExists).toBeFalsy()
+
     await projector.addDefinitionFromEpsgIo('EPSG:2154')
 
     const json: any = await projector.feature({

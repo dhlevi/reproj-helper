@@ -1,12 +1,25 @@
 import { __awaiter, __generator } from "tslib";
 import { ReProjector } from "../src/reprojector";
 describe('Reprojector.ts', function () {
+    it('Test def is registered', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var projector, defDoesntExist, defExists;
+        return __generator(this, function (_a) {
+            projector = new ReProjector();
+            defDoesntExist = projector.definitionIsRegistered('EPSG:2154');
+            expect(defDoesntExist).toBeFalsy();
+            defExists = projector.definitionIsRegistered('EPSG:WGS84');
+            expect(defExists).toBeTruthy();
+            return [2 /*return*/];
+        });
+    }); });
     it('Test epsg def', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var projector, json;
+        var projector, defExists, json;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     projector = new ReProjector();
+                    defExists = projector.definitionIsRegistered('EPSG:2154');
+                    expect(defExists).toBeFalsy();
                     return [4 /*yield*/, projector.addDefinitionFromEpsgIo('EPSG:2154')];
                 case 1:
                     _a.sent();

@@ -53,6 +53,7 @@ export declare class ReProjector {
      * @param from Code (usually an EPSG Code)
      */
     to(to: string): ReProjector;
+    definitionIsRegistered(epsgCode: string): boolean;
     /**
      * Will attempt to load a proj4 definition from epsg.io
      * @param epsgCode An EPSG Code, 3005 or EPSG:3005

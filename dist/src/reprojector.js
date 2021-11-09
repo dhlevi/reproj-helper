@@ -89,7 +89,6 @@ var ReProjector = /** @class */ (function () {
      * @param from Code (usually an EPSG Code)
      */
     ReProjector.prototype.from = function (from) {
-        console.debug("Projecting from " + from);
         this.fromProjection = from;
         return this;
     };
@@ -98,9 +97,13 @@ var ReProjector = /** @class */ (function () {
      * @param from Code (usually an EPSG Code)
      */
     ReProjector.prototype.to = function (to) {
-        console.debug("Projecting to " + to);
         this.toProjection = to;
         return this;
+    };
+    ReProjector.prototype.definitionIsRegistered = function (epsgCode) {
+        var code = epsgCode.trim().includes(':') ? epsgCode.split(':')[1].trim() : epsgCode.trim();
+        var def = proj4.defs(code);
+        return def != null;
     };
     /**
      * Will attempt to load a proj4 definition from epsg.io

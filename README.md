@@ -68,6 +68,18 @@ projector.addDefinitionFromEpsgIo('EPSG:2154')
 
 Pretty simple! Use the static initializer if you're running a one-off projection, and instantiate an object if you'll be doing a bunch.
 
+Note: You can also check if a definition exists already in proj4 by calling:
+
+```
+```Typescript
+const projector = new ReProjector()
+doesExists = projector.definitionIsRegistered('SomeCode')
+// or
+doesExist = ReProjector.instance().definitionIsRegistered('SomeCode')
+```
+
+That way you can avoid calling epsg.io unnecessarily.
+
 ### Got anything else?
 
 Yeah, there's a few helper methods also included in the `spatial-utils` static class

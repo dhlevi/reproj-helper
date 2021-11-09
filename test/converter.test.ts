@@ -7,8 +7,7 @@ describe('format-converter.ts', () => {
 
     let failed = false
     try {
-      const result = converter.fromWkt('POINT EMPTY').toGeoJson() as Feature
-      console.log(JSON.stringify(result))
+      converter.fromWkt('POINT EMPTY').toGeoJson() as Feature
     } catch (err) {
       failed = true
     }

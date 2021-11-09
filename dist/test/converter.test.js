@@ -2,13 +2,12 @@ import { __awaiter, __generator } from "tslib";
 import { FormatConverter } from "../src/format-converter";
 describe('format-converter.ts', function () {
     it('Test fail on empty', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var converter, failed, result;
+        var converter, failed;
         return __generator(this, function (_a) {
             converter = new FormatConverter();
             failed = false;
             try {
-                result = converter.fromWkt('POINT EMPTY').toGeoJson();
-                console.log(JSON.stringify(result));
+                converter.fromWkt('POINT EMPTY').toGeoJson();
             }
             catch (err) {
                 failed = true;

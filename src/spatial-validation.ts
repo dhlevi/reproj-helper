@@ -32,11 +32,6 @@ export class SpatialValidator {
       const y2 = secondCoord[1]
       const xl = x2 - x1
       const yl = y2 - y1
-      const xc = x - x1;
-      const yc = y - y1;
-
-      const cross = xc * yl - yc * xl
-      if (cross !== 0) return false
 
       let result = false
       if (Math.abs(xl) >= Math.abs(yl)) {
@@ -97,14 +92,12 @@ export class SpatialValidator {
       if (this.isPointInRing(point, ring[0])) {
         let isInHole = false
         let index = 1 // we've already checked the first ring, so we can now see if the point is in any subsequent holes
-
         while (index < ring.length && !isInHole) {
           if (this.isPointInRing(point, ring[index])) {
             isInHole = true
           }
           index++
         }
-
         if (!isInHole) {
           return true
         }
@@ -250,6 +243,7 @@ export class SpatialValidator {
                 if (this.isPointInPolygon(coord, geometry2)) return true
               }
             }
+
             return false
         }
     }
@@ -392,6 +386,7 @@ export class SpatialValidator {
                 }
               }
             }
+
             return false
         }
     }
@@ -402,7 +397,6 @@ export class SpatialValidator {
     switch (geometry1.type) {
       case "Point":
         return false // points cant cross anything
-        break
       case "LineString":
         switch (geometry2.type) {
           case "Point":
@@ -418,12 +412,11 @@ export class SpatialValidator {
 
                 const intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2])
                 if (intersection) intersections.push(intersection)
-                if (intersections.length > 1) return true
+                if (intersections.length >= 1) return true
               }
             }
 
             return false
-            break
           case "Polygon":
             for (let g1Ind = 0; g1Ind < geometry1.coordinates.length - 1; g1Ind++) {
               const g1Coord1 = geometry1.coordinates[g1Ind]
@@ -436,20 +429,17 @@ export class SpatialValidator {
   
                   const intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2])
                   if (intersection) intersections.push(intersection)
-                  if (intersections.length > 1) return true
+                  if (intersections.length >= 1) return true
                 }
               }
             }
 
             return false
-            break
         }
-        break
       case "Polygon":
         switch (geometry2.type) {
           case "Point":
             return false
-            break
           case "LineString":
             for (let g1Ind = 0; g1Ind < geometry2.coordinates.length - 1; g1Ind++) {
               const g1Coord1 = geometry2.coordinates[g1Ind]
@@ -462,13 +452,12 @@ export class SpatialValidator {
   
                   const intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2])
                   if (intersection) intersections.push(intersection)
-                  if (intersections.length > 3) return true
+                  if (intersections.length >= 1) return true
                 }
               }
             }
 
             return false
-            break
           case "Polygon":
             for (const ring of geometry1.coordinates) {
               for (let g1Ind = 0; g1Ind < ring.length - 1; g1Ind++) {
@@ -481,14 +470,13 @@ export class SpatialValidator {
 
                     const intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2])
                     if (intersection) intersections.push(intersection)
-                    if (intersections.length > 3) return true
+                    if (intersections.length >= 1) return true
                   }
                 }
               }
             }
 
             return false
-            break
         }
     }
   }

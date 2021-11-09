@@ -30,11 +30,6 @@ var SpatialValidator = /** @class */ (function () {
             var y2 = secondCoord[1];
             var xl = x2 - x1;
             var yl = y2 - y1;
-            var xc = x - x1;
-            var yc = y - y1;
-            var cross = xc * yl - yc * xl;
-            if (cross !== 0)
-                return false;
             var result = false;
             if (Math.abs(xl) >= Math.abs(yl)) {
                 result = xl > 0
@@ -423,7 +418,6 @@ var SpatialValidator = /** @class */ (function () {
         switch (geometry1.type) {
             case "Point":
                 return false; // points cant cross anything
-                break;
             case "LineString":
                 switch (geometry2.type) {
                     case "Point":
@@ -438,12 +432,11 @@ var SpatialValidator = /** @class */ (function () {
                                 var intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2]);
                                 if (intersection)
                                     intersections.push(intersection);
-                                if (intersections.length > 1)
+                                if (intersections.length >= 1)
                                     return true;
                             }
                         }
                         return false;
-                        break;
                     case "Polygon":
                         for (var g1Ind = 0; g1Ind < geometry1.coordinates.length - 1; g1Ind++) {
                             var g1Coord1 = geometry1.coordinates[g1Ind];
@@ -456,20 +449,17 @@ var SpatialValidator = /** @class */ (function () {
                                     var intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2]);
                                     if (intersection)
                                         intersections.push(intersection);
-                                    if (intersections.length > 1)
+                                    if (intersections.length >= 1)
                                         return true;
                                 }
                             }
                         }
                         return false;
-                        break;
                 }
-                break;
             case "Polygon":
                 switch (geometry2.type) {
                     case "Point":
                         return false;
-                        break;
                     case "LineString":
                         for (var g1Ind = 0; g1Ind < geometry2.coordinates.length - 1; g1Ind++) {
                             var g1Coord1 = geometry2.coordinates[g1Ind];
@@ -482,13 +472,12 @@ var SpatialValidator = /** @class */ (function () {
                                     var intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2]);
                                     if (intersection)
                                         intersections.push(intersection);
-                                    if (intersections.length > 3)
+                                    if (intersections.length >= 1)
                                         return true;
                                 }
                             }
                         }
                         return false;
-                        break;
                     case "Polygon":
                         for (var _d = 0, _e = geometry1.coordinates; _d < _e.length; _d++) {
                             var ring = _e[_d];
@@ -503,14 +492,13 @@ var SpatialValidator = /** @class */ (function () {
                                         var intersection = this.findIntersectingPoints([g1Coord1, g1Coord2], [g2Coord1, g2Coord2]);
                                         if (intersection)
                                             intersections.push(intersection);
-                                        if (intersections.length > 3)
+                                        if (intersections.length >= 1)
                                             return true;
                                     }
                                 }
                             }
                         }
                         return false;
-                        break;
                 }
         }
     };

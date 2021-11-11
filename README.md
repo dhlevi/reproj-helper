@@ -175,10 +175,11 @@ New in 1.3.0 is an additional package called SpatialValidation that includes a n
 - lineTopogrphicallyEquals
 - polygonTopographicallyEquals
 
-```typescript
+```Typescript
 SpatialValidator.doesIntersect(geom1, geom2)
+SpatialValidator.polygonTopographicallyEquals(geom1, geom2)
 ```
 
 ## Thanks!
 
-For more info on [proj4js](http://proj4js.org/), click that link. To find projection definitions, check ou [epsg.io](epsg.io)
+For more info on [proj4js](http://proj4js.org/), click that link. To find projection definitions, check out [epsg.io](epsg.io)
